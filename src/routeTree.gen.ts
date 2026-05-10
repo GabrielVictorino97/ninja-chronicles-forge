@@ -14,9 +14,15 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as CreateCharacterRouteImport } from './routes/create-character'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppShopRouteImport } from './routes/_app.shop'
+import { Route as AppRankingRouteImport } from './routes/_app.ranking'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppMissionsRouteImport } from './routes/_app.missions'
+import { Route as AppMapRouteImport } from './routes/_app.map'
 import { Route as AppJutsusRouteImport } from './routes/_app.jutsus'
+import { Route as AppInventoryRouteImport } from './routes/_app.inventory'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppClanRouteImport } from './routes/_app.clan'
 import { Route as AppCharacterRouteImport } from './routes/_app.character'
 import { Route as AppBattleRouteImport } from './routes/_app.battle'
 
@@ -44,9 +50,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppShopRoute = AppShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRankingRoute = AppRankingRouteImport.update({
+  id: '/ranking',
+  path: '/ranking',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMissionsRoute = AppMissionsRouteImport.update({
   id: '/missions',
   path: '/missions',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMapRoute = AppMapRouteImport.update({
+  id: '/map',
+  path: '/map',
   getParentRoute: () => AppRoute,
 } as any)
 const AppJutsusRoute = AppJutsusRouteImport.update({
@@ -54,9 +80,19 @@ const AppJutsusRoute = AppJutsusRouteImport.update({
   path: '/jutsus',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInventoryRoute = AppInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClanRoute = AppClanRouteImport.update({
+  id: '/clan',
+  path: '/clan',
   getParentRoute: () => AppRoute,
 } as any)
 const AppCharacterRoute = AppCharacterRouteImport.update({
@@ -77,9 +113,15 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/battle': typeof AppBattleRoute
   '/character': typeof AppCharacterRoute
+  '/clan': typeof AppClanRoute
   '/dashboard': typeof AppDashboardRoute
+  '/inventory': typeof AppInventoryRoute
   '/jutsus': typeof AppJutsusRoute
+  '/map': typeof AppMapRoute
   '/missions': typeof AppMissionsRoute
+  '/profile': typeof AppProfileRoute
+  '/ranking': typeof AppRankingRoute
+  '/shop': typeof AppShopRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -88,9 +130,15 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/battle': typeof AppBattleRoute
   '/character': typeof AppCharacterRoute
+  '/clan': typeof AppClanRoute
   '/dashboard': typeof AppDashboardRoute
+  '/inventory': typeof AppInventoryRoute
   '/jutsus': typeof AppJutsusRoute
+  '/map': typeof AppMapRoute
   '/missions': typeof AppMissionsRoute
+  '/profile': typeof AppProfileRoute
+  '/ranking': typeof AppRankingRoute
+  '/shop': typeof AppShopRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,9 +149,15 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_app/battle': typeof AppBattleRoute
   '/_app/character': typeof AppCharacterRoute
+  '/_app/clan': typeof AppClanRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/inventory': typeof AppInventoryRoute
   '/_app/jutsus': typeof AppJutsusRoute
+  '/_app/map': typeof AppMapRoute
   '/_app/missions': typeof AppMissionsRoute
+  '/_app/profile': typeof AppProfileRoute
+  '/_app/ranking': typeof AppRankingRoute
+  '/_app/shop': typeof AppShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -114,9 +168,15 @@ export interface FileRouteTypes {
     | '/register'
     | '/battle'
     | '/character'
+    | '/clan'
     | '/dashboard'
+    | '/inventory'
     | '/jutsus'
+    | '/map'
     | '/missions'
+    | '/profile'
+    | '/ranking'
+    | '/shop'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -125,9 +185,15 @@ export interface FileRouteTypes {
     | '/register'
     | '/battle'
     | '/character'
+    | '/clan'
     | '/dashboard'
+    | '/inventory'
     | '/jutsus'
+    | '/map'
     | '/missions'
+    | '/profile'
+    | '/ranking'
+    | '/shop'
   id:
     | '__root__'
     | '/'
@@ -137,9 +203,15 @@ export interface FileRouteTypes {
     | '/register'
     | '/_app/battle'
     | '/_app/character'
+    | '/_app/clan'
     | '/_app/dashboard'
+    | '/_app/inventory'
     | '/_app/jutsus'
+    | '/_app/map'
     | '/_app/missions'
+    | '/_app/profile'
+    | '/_app/ranking'
+    | '/_app/shop'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -187,11 +259,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/shop': {
+      id: '/_app/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof AppShopRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/ranking': {
+      id: '/_app/ranking'
+      path: '/ranking'
+      fullPath: '/ranking'
+      preLoaderRoute: typeof AppRankingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/missions': {
       id: '/_app/missions'
       path: '/missions'
       fullPath: '/missions'
       preLoaderRoute: typeof AppMissionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/map': {
+      id: '/_app/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof AppMapRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/jutsus': {
@@ -201,11 +301,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppJutsusRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/inventory': {
+      id: '/_app/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof AppInventoryRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/clan': {
+      id: '/_app/clan'
+      path: '/clan'
+      fullPath: '/clan'
+      preLoaderRoute: typeof AppClanRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/character': {
@@ -228,17 +342,29 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppBattleRoute: typeof AppBattleRoute
   AppCharacterRoute: typeof AppCharacterRoute
+  AppClanRoute: typeof AppClanRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppInventoryRoute: typeof AppInventoryRoute
   AppJutsusRoute: typeof AppJutsusRoute
+  AppMapRoute: typeof AppMapRoute
   AppMissionsRoute: typeof AppMissionsRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppRankingRoute: typeof AppRankingRoute
+  AppShopRoute: typeof AppShopRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppBattleRoute: AppBattleRoute,
   AppCharacterRoute: AppCharacterRoute,
+  AppClanRoute: AppClanRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppInventoryRoute: AppInventoryRoute,
   AppJutsusRoute: AppJutsusRoute,
+  AppMapRoute: AppMapRoute,
   AppMissionsRoute: AppMissionsRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppRankingRoute: AppRankingRoute,
+  AppShopRoute: AppShopRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
