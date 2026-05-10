@@ -20,6 +20,7 @@ import { Route as AdminVillagesRouteImport } from './routes/admin.villages'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCharactersRouteImport } from './routes/admin.characters'
+import { Route as AdminBattlesRouteImport } from './routes/admin.battles'
 import { Route as AppShopRouteImport } from './routes/_app.shop'
 import { Route as AppRankingRouteImport } from './routes/_app.ranking'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
@@ -84,6 +85,11 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
 const AdminCharactersRoute = AdminCharactersRouteImport.update({
   id: '/characters',
   path: '/characters',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBattlesRoute = AdminBattlesRouteImport.update({
+  id: '/battles',
+  path: '/battles',
   getParentRoute: () => AdminRoute,
 } as any)
 const AppShopRoute = AppShopRouteImport.update({
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
   '/shop': typeof AppShopRoute
+  '/admin/battles': typeof AdminBattlesRoute
   '/admin/characters': typeof AdminCharactersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/users': typeof AdminUsersRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
   '/shop': typeof AppShopRoute
+  '/admin/battles': typeof AdminBattlesRoute
   '/admin/characters': typeof AdminCharactersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/users': typeof AdminUsersRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/ranking': typeof AppRankingRoute
   '/_app/shop': typeof AppShopRoute
+  '/admin/battles': typeof AdminBattlesRoute
   '/admin/characters': typeof AdminCharactersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/users': typeof AdminUsersRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/ranking'
     | '/shop'
+    | '/admin/battles'
     | '/admin/characters'
     | '/admin/dashboard'
     | '/admin/users'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/ranking'
     | '/shop'
+    | '/admin/battles'
     | '/admin/characters'
     | '/admin/dashboard'
     | '/admin/users'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/ranking'
     | '/_app/shop'
+    | '/admin/battles'
     | '/admin/characters'
     | '/admin/dashboard'
     | '/admin/users'
@@ -370,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/characters'
       fullPath: '/admin/characters'
       preLoaderRoute: typeof AdminCharactersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/battles': {
+      id: '/admin/battles'
+      path: '/battles'
+      fullPath: '/admin/battles'
+      preLoaderRoute: typeof AdminBattlesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_app/shop': {
@@ -483,6 +502,7 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface AdminRouteChildren {
+  AdminBattlesRoute: typeof AdminBattlesRoute
   AdminCharactersRoute: typeof AdminCharactersRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -491,6 +511,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminBattlesRoute: AdminBattlesRoute,
   AdminCharactersRoute: AdminCharactersRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminUsersRoute: AdminUsersRoute,
