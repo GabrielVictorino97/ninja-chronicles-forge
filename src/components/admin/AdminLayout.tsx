@@ -118,7 +118,9 @@ export function AdminLayout() {
           </DropdownMenu>
         </header>
         <main className="flex-1 p-4 md:p-6 overflow-x-hidden">
-          <Outlet />
+          <div key={pathname} className="animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+            <Outlet />
+          </div>
         </main>
       </div>
 
