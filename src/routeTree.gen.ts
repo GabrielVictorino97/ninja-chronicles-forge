@@ -15,6 +15,7 @@ import { Route as CreateCharacterRouteImport } from './routes/create-character'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppCharacterRouteImport } from './routes/_app.character'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -45,12 +46,18 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCharacterRoute = AppCharacterRouteImport.update({
+  id: '/character',
+  path: '/character',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/character': typeof AppCharacterRoute
   '/dashboard': typeof AppDashboardRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +65,7 @@ export interface FileRoutesByTo {
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/character': typeof AppCharacterRoute
   '/dashboard': typeof AppDashboardRoute
 }
 export interface FileRoutesById {
@@ -67,13 +75,26 @@ export interface FileRoutesById {
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/_app/character': typeof AppCharacterRoute
   '/_app/dashboard': typeof AppDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/create-character' | '/login' | '/register' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/create-character'
+    | '/login'
+    | '/register'
+    | '/character'
+    | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create-character' | '/login' | '/register' | '/dashboard'
+  to:
+    | '/'
+    | '/create-character'
+    | '/login'
+    | '/register'
+    | '/character'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
@@ -81,6 +102,7 @@ export interface FileRouteTypes {
     | '/create-character'
     | '/login'
     | '/register'
+    | '/_app/character'
     | '/_app/dashboard'
   fileRoutesById: FileRoutesById
 }
@@ -136,14 +158,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/character': {
+      id: '/_app/character'
+      path: '/character'
+      fullPath: '/character'
+      preLoaderRoute: typeof AppCharacterRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppCharacterRoute: typeof AppCharacterRoute
   AppDashboardRoute: typeof AppDashboardRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppCharacterRoute: AppCharacterRoute,
   AppDashboardRoute: AppDashboardRoute,
 }
 
