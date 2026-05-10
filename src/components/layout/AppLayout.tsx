@@ -76,7 +76,7 @@ export function AppLayout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <Header onOpenSidebar={() => setSidebarOpen(true)} onLogout={() => { logout(); navigate({ to: "/login" }); }} />
         <main className="flex-1 px-4 pb-24 pt-4 md:px-6 lg:px-8 lg:pb-8">
-          <div key={path} className="animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+          <div key={path} className="animate-in fade-in duration-200">
             <Outlet />
           </div>
         </main>
