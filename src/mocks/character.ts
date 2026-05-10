@@ -1,0 +1,51 @@
+import type { Character, User, Notification } from "@/types";
+
+export const mockUser: User = {
+  id: "u1",
+  email: "shinobi@vila.gg",
+  name: "Shinobi Anônimo",
+  createdAt: new Date().toISOString(),
+};
+
+export const mockCharacter: Character = {
+  id: "c1",
+  userId: "u1",
+  name: "Kazumi",
+  avatar: "🦊",
+  villageId: "konoha",
+  clanId: "uzumaki",
+  element: "Fuuton",
+  graduation: "Chunin",
+  level: 18,
+  xp: 1450,
+  xpToNext: 2200,
+  hp: 820,
+  hpMax: 980,
+  chakra: 540,
+  chakraMax: 720,
+  energy: 80,
+  energyMax: 120,
+  ryous: 4280,
+  power: 12450,
+  attributes: {
+    taijutsu: 42,
+    ninjutsu: 58,
+    genjutsu: 25,
+    intelligence: 38,
+    vitality: 50,
+    chakra: 55,
+    agility: 41,
+    luck: 22,
+  },
+  unspentPoints: 5,
+  equippedJutsus: ["j-kunai", "j-rasengan", "j-katon-gokakyu", "j-chakra-control"],
+  knownJutsus: ["j-bunshin", "j-henge", "j-kawarimi", "j-kunai", "j-tai-combo", "j-chakra-control", "j-rasengan", "j-katon-gokakyu"],
+  createdAt: new Date().toISOString(),
+};
+
+export const mockNotifications: Notification[] = [
+  { id: "n1", title: "Missão concluída", description: "Você completou Patrulhar arredores de Konoha (+90 XP)", date: "agora", read: false, type: "mission" },
+  { id: "n2", title: "Subiu de nível!", description: "Você alcançou o nível 18.", date: "1h", read: false, type: "success" },
+  { id: "n3", title: "Convite de clã", description: "O clã Folha Negra te convidou.", date: "3h", read: true, type: "info" },
+  { id: "n4", title: "Batalha vencida", description: "Você derrotou um Bandido Errante.", date: "ontem", read: true, type: "battle" },
+];
