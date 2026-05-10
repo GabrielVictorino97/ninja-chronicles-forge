@@ -16,6 +16,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AppShopRouteImport } from './routes/_app.shop'
 import { Route as AppRankingRouteImport } from './routes/_app.ranking'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
@@ -60,6 +61,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AdminRoute,
 } as any)
 const AppShopRoute = AppShopRouteImport.update({
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
   '/shop': typeof AppShopRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
   '/shop': typeof AppShopRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/ranking': typeof AppRankingRoute
   '/_app/shop': typeof AppShopRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/ranking'
     | '/shop'
+    | '/admin/dashboard'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/ranking'
     | '/shop'
+    | '/admin/dashboard'
     | '/admin'
   id:
     | '__root__'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/ranking'
     | '/_app/shop'
+    | '/admin/dashboard'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -294,6 +306,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_app/shop': {
@@ -407,10 +426,12 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface AdminRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
