@@ -1,6 +1,6 @@
 interface Point { date?: string; name?: string; rank?: string; value: number }
 
-export function BarChart({ data, color = "hsl(var(--primary))" }: { data: Point[]; color?: string }) {
+export function BarChart({ data, color = "var(--primary)" }: { data: Point[]; color?: string }) {
   const max = Math.max(1, ...data.map((d) => d.value));
   return (
     <div className="flex items-end gap-1 h-40">
@@ -28,11 +28,11 @@ export function LineChart({ data }: { data: Point[] }) {
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-40" preserveAspectRatio="none">
       <defs>
         <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.45" />
-          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
+          <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <polyline fill="none" stroke="hsl(var(--primary))" strokeWidth="0.6" points={pts} />
+      <polyline fill="none" stroke="var(--primary)" strokeWidth="0.6" points={pts} />
       <polygon fill="url(#g1)" points={`0,${H} ${pts} ${W},${H}`} />
     </svg>
   );
@@ -46,7 +46,7 @@ export function DonutChart({ data }: { data: Point[] }) {
   return (
     <div className="flex items-center gap-4">
       <svg viewBox="0 0 40 40" className="w-32 h-32 -rotate-90">
-        <circle cx="20" cy="20" r={R} fill="none" stroke="hsl(var(--muted))" strokeWidth="6" />
+        <circle cx="20" cy="20" r={R} fill="none" stroke="var(--muted)" strokeWidth="6" />
         {data.map((d, i) => {
           const len = (d.value / total) * C;
           const dash = `${len} ${C - len}`;
