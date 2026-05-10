@@ -16,7 +16,9 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminCharactersRouteImport } from './routes/admin.characters'
 import { Route as AppShopRouteImport } from './routes/_app.shop'
 import { Route as AppRankingRouteImport } from './routes/_app.ranking'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
@@ -63,9 +65,19 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCharactersRoute = AdminCharactersRouteImport.update({
+  id: '/characters',
+  path: '/characters',
   getParentRoute: () => AdminRoute,
 } as any)
 const AppShopRoute = AppShopRouteImport.update({
@@ -141,7 +153,9 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
   '/shop': typeof AppShopRoute
+  '/admin/characters': typeof AdminCharactersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -160,7 +174,9 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
   '/shop': typeof AppShopRoute
+  '/admin/characters': typeof AdminCharactersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -182,7 +198,9 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/ranking': typeof AppRankingRoute
   '/_app/shop': typeof AppShopRoute
+  '/admin/characters': typeof AdminCharactersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -204,7 +222,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/ranking'
     | '/shop'
+    | '/admin/characters'
     | '/admin/dashboard'
+    | '/admin/users'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -223,7 +243,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/ranking'
     | '/shop'
+    | '/admin/characters'
     | '/admin/dashboard'
+    | '/admin/users'
     | '/admin'
   id:
     | '__root__'
@@ -244,7 +266,9 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/ranking'
     | '/_app/shop'
+    | '/admin/characters'
     | '/admin/dashboard'
+    | '/admin/users'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -308,11 +332,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/dashboard': {
       id: '/admin/dashboard'
       path: '/dashboard'
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/characters': {
+      id: '/admin/characters'
+      path: '/characters'
+      fullPath: '/admin/characters'
+      preLoaderRoute: typeof AdminCharactersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_app/shop': {
@@ -426,12 +464,16 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface AdminRouteChildren {
+  AdminCharactersRoute: typeof AdminCharactersRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminCharactersRoute: AdminCharactersRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -448,3 +490,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
