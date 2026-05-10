@@ -152,39 +152,39 @@ function Header({ onOpenSidebar, onLogout }: { onOpenSidebar: () => void; onLogo
   if (!character) return null;
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/70 backdrop-blur">
-      <div className="flex items-center gap-3 px-3 py-2 md:px-4">
+      <div className="flex items-center gap-3 px-3 py-3 md:gap-4 md:px-5 md:py-3.5">
         <Button variant="ghost" size="icon" className="lg:hidden" onClick={onOpenSidebar}>
-          <Menu className="size-5" />
+          <Menu className="size-6" />
         </Button>
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <div className="grid size-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-primary/30 to-accent/30 text-lg ring-2 ring-primary/40">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="grid size-12 shrink-0 place-items-center rounded-full bg-gradient-to-br from-primary/30 to-accent/30 text-2xl ring-2 ring-primary/40 shadow-glow-primary md:size-14">
             {character.avatar}
           </div>
           <div className="min-w-0 leading-tight">
-            <div className="truncate text-sm font-semibold">{character.name}</div>
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-              <span className="rounded bg-primary/15 px-1.5 py-0.5 font-semibold text-primary">Lv {character.level}</span>
-              <span>{character.graduation}</span>
+            <div className="truncate text-base font-bold md:text-lg">{character.name}</div>
+            <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground md:text-sm">
+              <span className="rounded-md bg-primary/15 px-2 py-0.5 text-xs font-bold text-primary md:text-sm">Lv {character.level}</span>
+              <span className="hidden sm:inline">{character.graduation}</span>
             </div>
           </div>
         </div>
 
-        <div className="hidden min-w-0 flex-1 items-center gap-3 md:flex">
-          <MiniBar icon={<Flame className="size-3.5 text-hp" />} value={character.hp} max={character.hpMax} tone="hp" />
-          <MiniBar icon={<Droplets className="size-3.5 text-chakra" />} value={character.chakra} max={character.chakraMax} tone="chakra" />
-          <MiniBar icon={<Zap className="size-3.5 text-energy" />} value={character.energy} max={character.energyMax} tone="energy" />
-          <MiniBar icon={<Star className="size-3.5 text-xp" />} value={character.xp} max={character.xpToNext} tone="xp" />
+        <div className="hidden min-w-0 flex-1 grid-cols-2 items-center gap-x-4 gap-y-1.5 md:grid xl:grid-cols-4">
+          <MiniBar icon={<Flame className="size-4 text-hp" />} label="HP" value={character.hp} max={character.hpMax} tone="hp" />
+          <MiniBar icon={<Droplets className="size-4 text-chakra" />} label="Chakra" value={character.chakra} max={character.chakraMax} tone="chakra" />
+          <MiniBar icon={<Zap className="size-4 text-energy" />} label="Energia" value={character.energy} max={character.energyMax} tone="energy" />
+          <MiniBar icon={<Star className="size-4 text-xp" />} label="XP" value={character.xp} max={character.xpToNext} tone="xp" />
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <div className="hidden items-center gap-1.5 rounded-md border border-ryous/30 bg-ryous/10 px-2 py-1 text-xs font-semibold text-ryous sm:flex">
-            <Coins className="size-3.5" />
+        <div className="ml-auto flex items-center gap-1.5 md:gap-2">
+          <div className="hidden items-center gap-1.5 rounded-md border border-ryous/30 bg-ryous/10 px-2.5 py-1.5 text-sm font-bold text-ryous sm:flex">
+            <Coins className="size-4" />
             <span className="tabular-nums">{character.ryous.toLocaleString()}</span>
           </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative size-10">
                 <Bell className="size-5" />
                 {unread > 0 && (
                   <span className="absolute right-1 top-1 grid size-4 place-items-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
@@ -205,23 +205,40 @@ function Header({ onOpenSidebar, onLogout }: { onOpenSidebar: () => void; onLogo
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" onClick={onLogout} title="Sair">
+          <Button variant="ghost" size="icon" className="size-10" onClick={onLogout} title="Sair">
             <LogOut className="size-5" />
           </Button>
+        </div>
+      </div>
+
+      {/* Mobile stat bars under header */}
+      <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-border/40 bg-background/50 px-3 py-2 md:hidden">
+        <MiniBar icon={<Flame className="size-3.5 text-hp" />} label="HP" value={character.hp} max={character.hpMax} tone="hp" />
+        <MiniBar icon={<Droplets className="size-3.5 text-chakra" />} label="Chakra" value={character.chakra} max={character.chakraMax} tone="chakra" />
+        <MiniBar icon={<Zap className="size-3.5 text-energy" />} label="Energia" value={character.energy} max={character.energyMax} tone="energy" />
+        <MiniBar icon={<Star className="size-3.5 text-xp" />} label="XP" value={character.xp} max={character.xpToNext} tone="xp" />
+      </div>
+      <div className="flex items-center justify-end border-t border-border/40 bg-background/50 px-3 py-1.5 sm:hidden">
+        <div className="flex items-center gap-1.5 rounded-md border border-ryous/30 bg-ryous/10 px-2 py-1 text-xs font-bold text-ryous">
+          <Coins className="size-3.5" />
+          <span className="tabular-nums">{character.ryous.toLocaleString()}</span>
         </div>
       </div>
     </header>
   );
 }
 
-function MiniBar({ icon, value, max, tone }: { icon: React.ReactNode; value: number; max: number; tone: "hp" | "chakra" | "energy" | "xp" }) {
+function MiniBar({ icon, label, value, max, tone }: { icon: React.ReactNode; label: string; value: number; max: number; tone: "hp" | "chakra" | "energy" | "xp" }) {
   return (
-    <div className="flex min-w-0 flex-1 items-center gap-2">
+    <div className="flex min-w-0 items-center gap-2">
       {icon}
-      <StatBar value={value} max={max} tone={tone} showValue={false} />
-      <span className="hidden w-16 shrink-0 text-right text-[10px] tabular-nums text-muted-foreground xl:inline">
-        {value}/{max}
-      </span>
+      <div className="min-w-0 flex-1">
+        <div className="mb-0.5 flex items-center justify-between text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+          <span>{label}</span>
+          <span className="tabular-nums">{value}/{max}</span>
+        </div>
+        <StatBar value={value} max={max} tone={tone} showValue={false} />
+      </div>
     </div>
   );
 }
