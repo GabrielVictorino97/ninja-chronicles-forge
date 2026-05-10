@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard, User, ScrollText, Swords, Sparkles, Backpack,
   Store, Users, Trophy, Map as MapIcon, Bell, LogOut, Menu, X,
-  Coins, Flame, Droplets, Zap,
+  Coins, Flame, Droplets, Zap, Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/store/gameStore";
@@ -173,6 +173,7 @@ function Header({ onOpenSidebar, onLogout }: { onOpenSidebar: () => void; onLogo
           <MiniBar icon={<Flame className="size-3.5 text-hp" />} value={character.hp} max={character.hpMax} tone="hp" />
           <MiniBar icon={<Droplets className="size-3.5 text-chakra" />} value={character.chakra} max={character.chakraMax} tone="chakra" />
           <MiniBar icon={<Zap className="size-3.5 text-energy" />} value={character.energy} max={character.energyMax} tone="energy" />
+          <MiniBar icon={<Star className="size-3.5 text-xp" />} value={character.xp} max={character.xpToNext} tone="xp" />
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -213,7 +214,7 @@ function Header({ onOpenSidebar, onLogout }: { onOpenSidebar: () => void; onLogo
   );
 }
 
-function MiniBar({ icon, value, max, tone }: { icon: React.ReactNode; value: number; max: number; tone: "hp" | "chakra" | "energy" }) {
+function MiniBar({ icon, value, max, tone }: { icon: React.ReactNode; value: number; max: number; tone: "hp" | "chakra" | "energy" | "xp" }) {
   return (
     <div className="flex min-w-0 flex-1 items-center gap-2">
       {icon}
