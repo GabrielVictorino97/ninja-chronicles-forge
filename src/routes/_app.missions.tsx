@@ -6,6 +6,7 @@ import { SectionTitle } from "@/components/game/SectionTitle";
 import { RankBadge } from "@/components/game/RankBadge";
 import { mockMissions } from "@/mocks/missions";
 import { missionService } from "@/services/missionService";
+import { useGameStore } from "@/store/gameStore";
 import { ScrollText, Coins, Zap, Star, Play, Check } from "lucide-react";
 import { toast } from "sonner";
 import type { Rank } from "@/types";
@@ -20,6 +21,8 @@ const RANKS: Rank[] = ["D", "C", "B", "A", "S"];
 function MissionsPage() {
   const [filter, setFilter] = useState<Rank | "ALL">("ALL");
   const list = mockMissions.filter((m) => filter === "ALL" || m.rank === filter);
+  const gainXp = useGameStore((s) => s.gainXp);
+  const gainRyous = useGameStore((s) => s.gainRyous);
 
   async function start(id: string, title: string) {
     await missionService.start(id);
@@ -27,7 +30,12 @@ function MissionsPage() {
   }
   async function complete(id: string) {
     const r = await missionService.complete(id);
+    const result = gainXp(r.xp);
+    gainRyous(r.ryous);
     toast.success(`Missão concluída! +${r.xp} XP, +${r.ryous} ryous`);
+    if (result.leveledUp) {
+      toast.success(`Subiu de nível! Agora você é nível ${result.newLevel}.`);
+    }
   }
 
   return (
