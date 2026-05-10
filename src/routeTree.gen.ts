@@ -15,6 +15,7 @@ import { Route as CreateCharacterRouteImport } from './routes/create-character'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AppShopRouteImport } from './routes/_app.shop'
 import { Route as AppRankingRouteImport } from './routes/_app.ranking'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
@@ -55,6 +56,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AppShopRoute = AppShopRouteImport.update({
   id: '/shop',
@@ -114,7 +120,7 @@ const AppBattleRoute = AppBattleRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -129,10 +135,10 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
   '/shop': typeof AppShopRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -147,12 +153,13 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
   '/shop': typeof AppShopRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -167,6 +174,7 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/ranking': typeof AppRankingRoute
   '/_app/shop': typeof AppShopRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -187,10 +195,10 @@ export interface FileRouteTypes {
     | '/profile'
     | '/ranking'
     | '/shop'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/create-character'
     | '/login'
     | '/register'
@@ -205,6 +213,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/ranking'
     | '/shop'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -224,12 +233,13 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/ranking'
     | '/_app/shop'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   CreateCharacterRoute: typeof CreateCharacterRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
@@ -278,6 +288,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_app/shop': {
       id: '/_app/shop'
@@ -389,10 +406,20 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface AdminRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   CreateCharacterRoute: CreateCharacterRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
@@ -400,3 +427,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
