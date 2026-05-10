@@ -10,6 +10,7 @@ import { useGameStore } from "@/store/gameStore";
 import { mockCharacter } from "@/mocks/character";
 import type { Battle } from "@/types";
 import { Swords, Shield, FlaskConical, DoorOpen, Sparkles, RefreshCcw } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/battle")({
   component: BattlePage,
@@ -18,19 +19,37 @@ export const Route = createFileRoute("/_app/battle")({
 
 function BattlePage() {
   const character = useGameStore((s) => s.character) ?? mockCharacter;
+  const gainXp = useGameStore((s) => s.gainXp);
+  const gainRyous = useGameStore((s) => s.gainRyous);
   const [battle, setBattle] = useState<Battle | null>(null);
+  const rewardedRef = useRef<string | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
   const equipped = mockJutsus.filter((j) => character.equippedJutsus.includes(j.id));
 
   useEffect(() => { battleService.start().then(setBattle); }, []);
   useEffect(() => { logRef.current?.scrollTo({ top: 9999, behavior: "smooth" }); }, [battle]);
+  useEffect(() => {
+    if (!battle || battle.status !== "victory") return;
+    if (rewardedRef.current === battle.id) return;
+    rewardedRef.current = battle.id;
+    const xp = 60 + battle.enemy.level * 8;
+    const ryous = 40 + battle.enemy.level * 5;
+    const r = gainXp(xp);
+    gainRyous(ryous);
+    toast.success(`Vitória! +${xp} XP, +${ryous} ryous`);
+    if (r.leveledUp) toast.success(`Subiu de nível! Agora você é nível ${r.newLevel}.`);
+  }, [battle, gainXp, gainRyous]);
 
   if (!battle) return <div className="grid h-72 place-items-center text-muted-foreground">Carregando arena...</div>;
 
   function act(action: "basic" | "defend" | "item" | "flee" | "jutsu", name?: string) {
     setBattle((b) => (b ? battleService.simulateAction(b, action, name) : b));
   }
-  async function reset() { setBattle(await battleService.start()); }
+  async function reset() {
+    const b = await battleService.start();
+    rewardedRef.current = null;
+    setBattle(b);
+  }
 
   return (
     <div className="space-y-5">
