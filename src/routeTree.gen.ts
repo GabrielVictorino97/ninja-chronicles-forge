@@ -14,8 +14,10 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as CreateCharacterRouteImport } from './routes/create-character'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppMissionsRouteImport } from './routes/_app.missions'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppCharacterRouteImport } from './routes/_app.character'
+import { Route as AppBattleRouteImport } from './routes/_app.battle'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -41,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppMissionsRoute = AppMissionsRouteImport.update({
+  id: '/missions',
+  path: '/missions',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -51,22 +58,31 @@ const AppCharacterRoute = AppCharacterRouteImport.update({
   path: '/character',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBattleRoute = AppBattleRouteImport.update({
+  id: '/battle',
+  path: '/battle',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/battle': typeof AppBattleRoute
   '/character': typeof AppCharacterRoute
   '/dashboard': typeof AppDashboardRoute
+  '/missions': typeof AppMissionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/battle': typeof AppBattleRoute
   '/character': typeof AppCharacterRoute
   '/dashboard': typeof AppDashboardRoute
+  '/missions': typeof AppMissionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -75,8 +91,10 @@ export interface FileRoutesById {
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/_app/battle': typeof AppBattleRoute
   '/_app/character': typeof AppCharacterRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/missions': typeof AppMissionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -85,16 +103,20 @@ export interface FileRouteTypes {
     | '/create-character'
     | '/login'
     | '/register'
+    | '/battle'
     | '/character'
     | '/dashboard'
+    | '/missions'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/create-character'
     | '/login'
     | '/register'
+    | '/battle'
     | '/character'
     | '/dashboard'
+    | '/missions'
   id:
     | '__root__'
     | '/'
@@ -102,8 +124,10 @@ export interface FileRouteTypes {
     | '/create-character'
     | '/login'
     | '/register'
+    | '/_app/battle'
     | '/_app/character'
     | '/_app/dashboard'
+    | '/_app/missions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -151,6 +175,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/missions': {
+      id: '/_app/missions'
+      path: '/missions'
+      fullPath: '/missions'
+      preLoaderRoute: typeof AppMissionsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -165,17 +196,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCharacterRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/battle': {
+      id: '/_app/battle'
+      path: '/battle'
+      fullPath: '/battle'
+      preLoaderRoute: typeof AppBattleRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppBattleRoute: typeof AppBattleRoute
   AppCharacterRoute: typeof AppCharacterRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppMissionsRoute: typeof AppMissionsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppBattleRoute: AppBattleRoute,
   AppCharacterRoute: AppCharacterRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppMissionsRoute: AppMissionsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
