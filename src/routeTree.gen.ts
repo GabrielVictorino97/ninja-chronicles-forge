@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminVillagesRouteImport } from './routes/admin.villages'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminRankingsRouteImport } from './routes/admin.rankings'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCharactersRouteImport } from './routes/admin.characters'
 import { Route as AdminBattlesRouteImport } from './routes/admin.battles'
@@ -75,6 +76,11 @@ const AdminVillagesRoute = AdminVillagesRouteImport.update({
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRankingsRoute = AdminRankingsRouteImport.update({
+  id: '/rankings',
+  path: '/rankings',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/admin/battles': typeof AdminBattlesRoute
   '/admin/characters': typeof AdminCharactersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/rankings': typeof AdminRankingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/villages': typeof AdminVillagesRoute
   '/admin/': typeof AdminIndexRoute
@@ -191,6 +198,7 @@ export interface FileRoutesByTo {
   '/admin/battles': typeof AdminBattlesRoute
   '/admin/characters': typeof AdminCharactersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/rankings': typeof AdminRankingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/villages': typeof AdminVillagesRoute
   '/admin': typeof AdminIndexRoute
@@ -217,6 +225,7 @@ export interface FileRoutesById {
   '/admin/battles': typeof AdminBattlesRoute
   '/admin/characters': typeof AdminCharactersRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/rankings': typeof AdminRankingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/villages': typeof AdminVillagesRoute
   '/admin/': typeof AdminIndexRoute
@@ -243,6 +252,7 @@ export interface FileRouteTypes {
     | '/admin/battles'
     | '/admin/characters'
     | '/admin/dashboard'
+    | '/admin/rankings'
     | '/admin/users'
     | '/admin/villages'
     | '/admin/'
@@ -266,6 +276,7 @@ export interface FileRouteTypes {
     | '/admin/battles'
     | '/admin/characters'
     | '/admin/dashboard'
+    | '/admin/rankings'
     | '/admin/users'
     | '/admin/villages'
     | '/admin'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/admin/battles'
     | '/admin/characters'
     | '/admin/dashboard'
+    | '/admin/rankings'
     | '/admin/users'
     | '/admin/villages'
     | '/admin/'
@@ -368,6 +380,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/rankings': {
+      id: '/admin/rankings'
+      path: '/rankings'
+      fullPath: '/admin/rankings'
+      preLoaderRoute: typeof AdminRankingsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/dashboard': {
@@ -505,6 +524,7 @@ interface AdminRouteChildren {
   AdminBattlesRoute: typeof AdminBattlesRoute
   AdminCharactersRoute: typeof AdminCharactersRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminRankingsRoute: typeof AdminRankingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVillagesRoute: typeof AdminVillagesRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -514,6 +534,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBattlesRoute: AdminBattlesRoute,
   AdminCharactersRoute: AdminCharactersRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminRankingsRoute: AdminRankingsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVillagesRoute: AdminVillagesRoute,
   AdminIndexRoute: AdminIndexRoute,
