@@ -1,7 +1,6 @@
 import type { Jutsu } from "@/types";
 
 export const mockJutsus: Jutsu[] = [
-export const mockJutsus: Jutsu[] = [
   // ===== Básicos — Estudante / Genin (Lv 1-10) =====
   { id: "j-bunshin", name: "Bunshin no Jutsu", type: "Ninjutsu", chakraCost: 10, cooldown: 1, baseDamage: 0, description: "Cria clones ilusórios para confundir o oponente.", requirements: { level: 1 } },
   { id: "j-henge", name: "Henge no Jutsu", type: "Ninjutsu", chakraCost: 8, cooldown: 1, baseDamage: 0, description: "Transforma a aparência do usuário.", requirements: { level: 1 } },
