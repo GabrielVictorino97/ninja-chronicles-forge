@@ -15,6 +15,7 @@ import { Route as CreateCharacterRouteImport } from './routes/create-character'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppMissionsRouteImport } from './routes/_app.missions'
+import { Route as AppJutsusRouteImport } from './routes/_app.jutsus'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppCharacterRouteImport } from './routes/_app.character'
 import { Route as AppBattleRouteImport } from './routes/_app.battle'
@@ -48,6 +49,11 @@ const AppMissionsRoute = AppMissionsRouteImport.update({
   path: '/missions',
   getParentRoute: () => AppRoute,
 } as any)
+const AppJutsusRoute = AppJutsusRouteImport.update({
+  id: '/jutsus',
+  path: '/jutsus',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/battle': typeof AppBattleRoute
   '/character': typeof AppCharacterRoute
   '/dashboard': typeof AppDashboardRoute
+  '/jutsus': typeof AppJutsusRoute
   '/missions': typeof AppMissionsRoute
 }
 export interface FileRoutesByTo {
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/battle': typeof AppBattleRoute
   '/character': typeof AppCharacterRoute
   '/dashboard': typeof AppDashboardRoute
+  '/jutsus': typeof AppJutsusRoute
   '/missions': typeof AppMissionsRoute
 }
 export interface FileRoutesById {
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/_app/battle': typeof AppBattleRoute
   '/_app/character': typeof AppCharacterRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/jutsus': typeof AppJutsusRoute
   '/_app/missions': typeof AppMissionsRoute
 }
 export interface FileRouteTypes {
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/battle'
     | '/character'
     | '/dashboard'
+    | '/jutsus'
     | '/missions'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/battle'
     | '/character'
     | '/dashboard'
+    | '/jutsus'
     | '/missions'
   id:
     | '__root__'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/_app/battle'
     | '/_app/character'
     | '/_app/dashboard'
+    | '/_app/jutsus'
     | '/_app/missions'
   fileRoutesById: FileRoutesById
 }
@@ -182,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMissionsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/jutsus': {
+      id: '/_app/jutsus'
+      path: '/jutsus'
+      fullPath: '/jutsus'
+      preLoaderRoute: typeof AppJutsusRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -210,6 +229,7 @@ interface AppRouteChildren {
   AppBattleRoute: typeof AppBattleRoute
   AppCharacterRoute: typeof AppCharacterRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppJutsusRoute: typeof AppJutsusRoute
   AppMissionsRoute: typeof AppMissionsRoute
 }
 
@@ -217,6 +237,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppBattleRoute: AppBattleRoute,
   AppCharacterRoute: AppCharacterRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppJutsusRoute: AppJutsusRoute,
   AppMissionsRoute: AppMissionsRoute,
 }
 
