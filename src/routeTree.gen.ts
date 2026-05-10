@@ -12,8 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CreateCharacterRouteImport } from './routes/create-character'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminVillagesRouteImport } from './routes/admin.villages'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminRankingsRouteImport } from './routes/admin.rankings'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminCharactersRouteImport } from './routes/admin.characters'
+import { Route as AdminBattlesRouteImport } from './routes/admin.battles'
 import { Route as AppShopRouteImport } from './routes/_app.shop'
 import { Route as AppRankingRouteImport } from './routes/_app.ranking'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
@@ -41,6 +49,11 @@ const CreateCharacterRoute = CreateCharacterRouteImport.update({
   path: '/create-character',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -49,6 +62,41 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminVillagesRoute = AdminVillagesRouteImport.update({
+  id: '/villages',
+  path: '/villages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRankingsRoute = AdminRankingsRouteImport.update({
+  id: '/rankings',
+  path: '/rankings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCharactersRoute = AdminCharactersRouteImport.update({
+  id: '/characters',
+  path: '/characters',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBattlesRoute = AdminBattlesRouteImport.update({
+  id: '/battles',
+  path: '/battles',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AppShopRoute = AppShopRouteImport.update({
   id: '/shop',
@@ -108,6 +156,7 @@ const AppBattleRoute = AppBattleRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -122,6 +171,13 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
   '/shop': typeof AppShopRoute
+  '/admin/battles': typeof AdminBattlesRoute
+  '/admin/characters': typeof AdminCharactersRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/rankings': typeof AdminRankingsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/villages': typeof AdminVillagesRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -139,11 +195,19 @@ export interface FileRoutesByTo {
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
   '/shop': typeof AppShopRoute
+  '/admin/battles': typeof AdminBattlesRoute
+  '/admin/characters': typeof AdminCharactersRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/rankings': typeof AdminRankingsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/villages': typeof AdminVillagesRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -158,11 +222,19 @@ export interface FileRoutesById {
   '/_app/profile': typeof AppProfileRoute
   '/_app/ranking': typeof AppRankingRoute
   '/_app/shop': typeof AppShopRoute
+  '/admin/battles': typeof AdminBattlesRoute
+  '/admin/characters': typeof AdminCharactersRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/rankings': typeof AdminRankingsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/villages': typeof AdminVillagesRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/create-character'
     | '/login'
     | '/register'
@@ -177,6 +249,13 @@ export interface FileRouteTypes {
     | '/profile'
     | '/ranking'
     | '/shop'
+    | '/admin/battles'
+    | '/admin/characters'
+    | '/admin/dashboard'
+    | '/admin/rankings'
+    | '/admin/users'
+    | '/admin/villages'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -194,10 +273,18 @@ export interface FileRouteTypes {
     | '/profile'
     | '/ranking'
     | '/shop'
+    | '/admin/battles'
+    | '/admin/characters'
+    | '/admin/dashboard'
+    | '/admin/rankings'
+    | '/admin/users'
+    | '/admin/villages'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/_app'
+    | '/admin'
     | '/create-character'
     | '/login'
     | '/register'
@@ -212,11 +299,19 @@ export interface FileRouteTypes {
     | '/_app/profile'
     | '/_app/ranking'
     | '/_app/shop'
+    | '/admin/battles'
+    | '/admin/characters'
+    | '/admin/dashboard'
+    | '/admin/rankings'
+    | '/admin/users'
+    | '/admin/villages'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   CreateCharacterRoute: typeof CreateCharacterRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
@@ -245,6 +340,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreateCharacterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -258,6 +360,55 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/villages': {
+      id: '/admin/villages'
+      path: '/villages'
+      fullPath: '/admin/villages'
+      preLoaderRoute: typeof AdminVillagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/rankings': {
+      id: '/admin/rankings'
+      path: '/rankings'
+      fullPath: '/admin/rankings'
+      preLoaderRoute: typeof AdminRankingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/characters': {
+      id: '/admin/characters'
+      path: '/characters'
+      fullPath: '/admin/characters'
+      preLoaderRoute: typeof AdminCharactersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/battles': {
+      id: '/admin/battles'
+      path: '/battles'
+      fullPath: '/admin/battles'
+      preLoaderRoute: typeof AdminBattlesRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_app/shop': {
       id: '/_app/shop'
@@ -369,9 +520,32 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface AdminRouteChildren {
+  AdminBattlesRoute: typeof AdminBattlesRoute
+  AdminCharactersRoute: typeof AdminCharactersRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminRankingsRoute: typeof AdminRankingsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminVillagesRoute: typeof AdminVillagesRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminBattlesRoute: AdminBattlesRoute,
+  AdminCharactersRoute: AdminCharactersRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminRankingsRoute: AdminRankingsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminVillagesRoute: AdminVillagesRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   CreateCharacterRoute: CreateCharacterRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
@@ -379,13 +553,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
