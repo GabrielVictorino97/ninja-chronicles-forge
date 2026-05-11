@@ -32,10 +32,14 @@ function LoginPage() {
   });
 
   async function onSubmit(values: FormData) {
-    const user = await authService.login(values.email, values.password);
-    login(user);
-    toast.success("Bem-vindo de volta, shinobi!");
-    navigate({ to: "/dashboard" });
+    try {
+      const res = await authService.login(values.email, values.password);
+      login(res.user);
+      toast.success("Bem-vindo de volta, shinobi!");
+      navigate({ to: "/dashboard" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha no login");
+    }
   }
 
   return (

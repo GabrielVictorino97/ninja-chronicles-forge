@@ -33,14 +33,20 @@ const MOBILE_NAV = NAV.slice(0, 5);
 
 export function AppLayout() {
   const navigate = useNavigate();
-  const { isAuthenticated, character, hasCharacter, logout, seedDemo } = useGameStore();
+  const { isAuthenticated, character, hasCharacter, logout, hydrate } = useGameStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
 
-  // Auto-seed demo data so the prototype is browseable without a real backend.
+  // Reidrata sessão a partir do JWT salvo; redireciona para login se não autenticado.
   useEffect(() => {
-    if (!isAuthenticated) seedDemo();
-  }, [isAuthenticated, seedDemo]);
+    if (!isAuthenticated) {
+      hydrate().then(() => {
+        if (!useGameStore.getState().isAuthenticated) {
+          navigate({ to: "/login" });
+        }
+      });
+    }
+  }, [isAuthenticated, hydrate, navigate]);
 
   useEffect(() => {
     if (isAuthenticated && !hasCharacter && path !== "/create-character") {

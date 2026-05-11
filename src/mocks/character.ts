@@ -14,7 +14,7 @@ export const mockCharacter: Character = {
   avatar: "🦊",
   villageId: "konoha",
   clanId: "uzumaki",
-  element: "Fuuton",
+  elements: ["Fuuton"],
   graduation: "Chunin",
   level: 18,
   xp: 1450,

@@ -111,7 +111,8 @@ export interface Character {
   avatar: string;
   villageId: VillageId;
   clanId: BloodlineClanId;
-  element: ElementAffinity;
+  /** Backend retorna lista — personagem começa sem elementos e aprende a partir do nível 20. */
+  elements: ElementAffinity[];
   graduation: Graduation;
   level: number;
   xp: number;
@@ -248,4 +249,30 @@ export interface Notification {
   date: string;
   read: boolean;
   type: "info" | "success" | "warning" | "battle" | "mission";
+}
+
+// ----- Backend extras -----
+
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: User & { role?: string };
+}
+
+export interface HuntStatus {
+  active: boolean;
+  huntLevel: number;
+  durationMinutes: number;
+  xpReward: number;
+  ryousReward: number;
+  startTime: string;
+  endTime: string;
+  secondsRemaining: number;
+  availableDurations: number[];
+}
+
+export interface ElementOption {
+  name: ElementAffinity;
+  description: string;
+  requiredLevel: number;
 }

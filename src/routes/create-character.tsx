@@ -8,20 +8,11 @@ import { Progress } from "@/components/ui/progress";
 import { mockVillages } from "@/mocks/villages";
 import { mockBloodlineClans } from "@/mocks/clans";
 import { cn } from "@/lib/utils";
-import type { BloodlineClanId, ElementAffinity, VillageId, BaseAttributes } from "@/types";
+import type { BloodlineClanId, VillageId, BaseAttributes } from "@/types";
 import { useGameStore } from "@/store/gameStore";
 import { characterService } from "@/services/characterService";
-import { mockCharacter } from "@/mocks/character";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Check, Flame, Droplet, Mountain, Wind, Zap } from "lucide-react";
-
-const ELEMENTS: { id: ElementAffinity; label: string; icon: React.ReactNode; color: string }[] = [
-  { id: "Katon", label: "Katon — Fogo", icon: <Flame />, color: "text-fire" },
-  { id: "Suiton", label: "Suiton — Água", icon: <Droplet />, color: "text-water" },
-  { id: "Doton", label: "Doton — Terra", icon: <Mountain />, color: "text-earth" },
-  { id: "Fuuton", label: "Fuuton — Vento", icon: <Wind />, color: "text-wind" },
-  { id: "Raiton", label: "Raiton — Raio", icon: <Zap />, color: "text-lightning" },
-];
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 
 const AVATARS = ["🦊", "🐉", "🐺", "🦅", "🐍", "🐢", "🦂", "🐅", "🦉", "🐝", "🦇", "🐲"];
 const ATTR_LABELS: Record<keyof BaseAttributes, string> = {
@@ -44,7 +35,6 @@ function CreateCharacterPage() {
   const [avatar, setAvatar] = useState(AVATARS[0]);
   const [village, setVillage] = useState<VillageId | null>(null);
   const [clan, setClan] = useState<BloodlineClanId | null>(null);
-  const [element, setElement] = useState<ElementAffinity | null>(null);
   const [attrs, setAttrs] = useState<BaseAttributes>({
     taijutsu: STARTING_BASE, ninjutsu: STARTING_BASE, genjutsu: STARTING_BASE,
     intelligence: STARTING_BASE, vitality: STARTING_BASE, chakra: STARTING_BASE,
@@ -57,25 +47,40 @@ function CreateCharacterPage() {
     1: name.trim().length >= 3,
     2: !!village,
     3: !!clan,
-    4: !!element,
-    5: remaining === 0,
+    4: remaining === 0,
   };
 
   async function finish() {
-    const created = await characterService.create({
-      ...mockCharacter, name, avatar, villageId: village!, clanId: clan!, element: element!, attributes: attrs,
-    });
-    setCharacter(created);
-    toast.success(`${name} entrou no mundo ninja!`);
-    navigate({ to: "/dashboard" });
+    try {
+      const created = await characterService.create({
+        name,
+        avatar,
+        villageId: village!,
+        clanId: clan!,
+      });
+      // Distribui pontos iniciais (delta sobre o base 5).
+      const delta: Partial<BaseAttributes> = {};
+      (Object.keys(attrs) as (keyof BaseAttributes)[]).forEach((k) => {
+        const d = attrs[k] - STARTING_BASE;
+        if (d > 0) delta[k] = d;
+      });
+      const final = Object.keys(delta).length
+        ? await characterService.distributePoints(delta)
+        : created;
+      setCharacter(final);
+      toast.success(`${name} entrou no mundo ninja!`);
+      navigate({ to: "/dashboard" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao criar personagem");
+    }
   }
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-4xl px-4 py-8">
       <div className="mb-6 text-center">
         <h1 className="text-3xl font-black text-gradient-primary">Forje seu Ninja</h1>
-        <p className="text-sm text-muted-foreground">Etapa {step} de 5</p>
-        <Progress value={(step / 5) * 100} className="mx-auto mt-3 max-w-md" />
+        <p className="text-sm text-muted-foreground">Etapa {step} de 4</p>
+        <Progress value={(step / 4) * 100} className="mx-auto mt-3 max-w-md" />
       </div>
 
       <Card className="bg-card/80 backdrop-blur shadow-card">
@@ -146,26 +151,14 @@ function CreateCharacterPage() {
           )}
 
           {step === 4 && (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              {ELEMENTS.map((e) => (
-                <button key={e.id} onClick={() => setElement(e.id)}
-                  className={cn(
-                    "flex flex-col items-center gap-2 rounded-xl border bg-muted/40 p-4 transition",
-                    element === e.id ? "border-primary bg-primary/10 shadow-glow-primary" : "hover:border-primary/50",
-                  )}>
-                  <span className={cn("text-3xl", e.color)}>{e.icon}</span>
-                  <span className="text-sm font-semibold">{e.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {step === 5 && (
             <div>
               <div className="mb-4 flex items-center justify-between rounded-lg border border-primary/30 bg-primary/10 p-3">
                 <span className="text-sm font-medium">Pontos restantes</span>
                 <span className="text-lg font-black text-primary tabular-nums">{remaining}</span>
               </div>
+              <p className="mb-3 text-xs text-muted-foreground">
+                Você começa sem elemento — aprenda o seu primeiro a partir do nível 20 na tela de personagem.
+              </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 {(Object.keys(attrs) as (keyof BaseAttributes)[]).map((k) => (
                   <div key={k} className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2">
@@ -190,12 +183,12 @@ function CreateCharacterPage() {
             <Button variant="ghost" onClick={() => setStep((s) => Math.max(1, s - 1))} disabled={step === 1}>
               <ArrowLeft className="size-4" /> Voltar
             </Button>
-            {step < 5 ? (
+            {step < 4 ? (
               <Button onClick={() => setStep((s) => s + 1)} disabled={!canNext[step]}>
                 Continuar <ArrowRight className="size-4" />
               </Button>
             ) : (
-              <Button onClick={finish} disabled={!canNext[5]}>
+              <Button onClick={finish} disabled={!canNext[4]}>
                 Concluir <Check className="size-4" />
               </Button>
             )}
@@ -206,11 +199,10 @@ function CreateCharacterPage() {
   );
 }
 
-const titles = ["Identidade", "Vila Natal", "Clã de Sangue", "Elemento Primário", "Distribuir Atributos"];
+const titles = ["Identidade", "Vila Natal", "Clã de Sangue", "Distribuir Atributos"];
 const descriptions = [
   "Escolha o nome e o avatar do seu shinobi.",
   "Onde sua jornada começa.",
   "Sua linhagem definirá habilidades únicas.",
-  "Qual elemento corre no seu chakra?",
   "Distribua 20 pontos entre os atributos iniciais.",
 ];

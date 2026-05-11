@@ -40,7 +40,7 @@ function DashboardPage() {
               <div>
                 <h2 className="text-2xl font-black">{character.name}</h2>
                 <p className="text-sm text-muted-foreground">
-                  {village?.fullName} • Clã {clan?.name} • {character.element} • {character.graduation}
+                  {village?.fullName} • Clã {clan?.name} • {character.elements?.[0] ?? "Sem elemento"} • {character.graduation}
                 </p>
               </div>
               <div className="grid gap-2 sm:grid-cols-2">

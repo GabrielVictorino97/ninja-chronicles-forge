@@ -1,16 +1,36 @@
-import { mockCharacter } from "@/mocks/character";
-import type { Character, BaseAttributes } from "@/types";
-import { mockRequest } from "./api";
+import type { BaseAttributes, Character, ElementOption, BloodlineClan, Village } from "@/types";
+import { apiClient } from "@/lib/api";
+
+interface CreateCharacterInput {
+  name: string;
+  avatar: string;
+  villageId: string;
+  clanId: string;
+}
 
 export const characterService = {
-  async get(): Promise<Character> {
-    return mockRequest(mockCharacter);
+  get(): Promise<Character> {
+    return apiClient.get<Character>("/characters/me");
   },
-  async create(input: Partial<Character>): Promise<Character> {
-    // Real attribute validation/calculation will run on the backend.
-    return mockRequest({ ...mockCharacter, ...input, id: "c-new" });
+  getById(id: string): Promise<Character> {
+    return apiClient.get<Character>(`/characters/${id}`);
   },
-  async distributePoints(_attrs: Partial<BaseAttributes>): Promise<Character> {
-    return mockRequest(mockCharacter);
+  create(input: CreateCharacterInput): Promise<Character> {
+    return apiClient.post<Character>("/characters", input);
+  },
+  distributePoints(attributes: Partial<BaseAttributes>): Promise<Character> {
+    return apiClient.put<Character>("/characters/me/attributes", { attributes });
+  },
+  listVillages(): Promise<Village[]> {
+    return apiClient.get<Village[]>("/villages", { auth: false });
+  },
+  listBloodlineClans(): Promise<BloodlineClan[]> {
+    return apiClient.get<BloodlineClan[]>("/bloodline-clans", { auth: false });
+  },
+  listElements(): Promise<ElementOption[]> {
+    return apiClient.get<ElementOption[]>("/elements", { auth: false });
+  },
+  learnElement(element: string): Promise<void> {
+    return apiClient.post<void>(`/elements/${element}/learn`);
   },
 };
