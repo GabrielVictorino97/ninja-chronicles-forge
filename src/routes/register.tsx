@@ -31,10 +31,14 @@ function RegisterPage() {
     useForm<FormData>({ resolver: zodResolver(schema) });
 
   async function onSubmit(v: FormData) {
-    const user = await authService.register(v.name, v.email, v.password);
-    login(user);
-    toast.success("Conta criada! Crie seu personagem agora.");
-    navigate({ to: "/create-character" });
+    try {
+      const res = await authService.register(v.name, v.email, v.password);
+      login(res.user);
+      toast.success("Conta criada! Crie seu personagem agora.");
+      navigate({ to: "/create-character" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha no cadastro");
+    }
   }
 
   return (
