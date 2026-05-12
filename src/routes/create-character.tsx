@@ -65,7 +65,7 @@ function CreateCharacterPage() {
         if (d > 0) delta[k] = d;
       });
       const final = Object.keys(delta).length
-        ? await characterService.distributePoints(delta)
+        ? await characterService.distributePoints(created.id, delta)
         : created;
       setCharacter(final);
       toast.success(`${name} entrou no mundo ninja!`);
