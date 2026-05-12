@@ -18,11 +18,8 @@ export const characterService = {
   create(input: CreateCharacterInput): Promise<Character> {
     return apiClient.post<Character>("/characters", input);
   },
-  distributePoints(attributes: Partial<BaseAttributes>): Promise<Character> {
-    return apiClient.put<Character>(
-      `/characters/${arguments[1] ?? ""}/attributes`,
-      { attributes },
-    );
+  distributePoints(characterId: string, attributes: Partial<BaseAttributes>): Promise<Character> {
+    return apiClient.put<Character>(`/characters/${characterId}/attributes`, { attributes });
   },
   listVillages(): Promise<Village[]> {
     return apiClient.get<Village[]>("/villages", { auth: false });
