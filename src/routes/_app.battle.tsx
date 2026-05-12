@@ -1,15 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { SectionTitle } from "@/components/game/SectionTitle";
-import { StatBar } from "@/components/game/StatBar";
-import { battleService } from "@/services/battleService";
-import { mockJutsus } from "@/mocks/jutsus";
 import { useGameStore } from "@/store/gameStore";
-import { mockCharacter } from "@/mocks/character";
-import type { Battle } from "@/types";
-import { Swords, Shield, FlaskConical, DoorOpen, Sparkles, RefreshCcw } from "lucide-react";
+import { characterService } from "@/services/characterService";
+import { npcBattle, pvpBattle, type BattleResult, type Difficulty } from "@/services/battleService";
+import { Swords, Users, Loader2, Trophy, Skull } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/battle")({
@@ -18,106 +16,126 @@ export const Route = createFileRoute("/_app/battle")({
 });
 
 function BattlePage() {
-  const character = useGameStore((s) => s.character) ?? mockCharacter;
-  const gainXp = useGameStore((s) => s.gainXp);
-  const gainRyous = useGameStore((s) => s.gainRyous);
-  const [battle, setBattle] = useState<Battle | null>(null);
-  const rewardedRef = useRef<string | null>(null);
-  const logRef = useRef<HTMLDivElement>(null);
-  const equipped = mockJutsus.filter((j) => character.equippedJutsus.includes(j.id));
+  const character = useGameStore((s) => s.character);
+  const setCharacter = useGameStore((s) => s.setCharacter);
+  const [tab, setTab] = useState<"npc" | "pvp">("npc");
+  const [difficulty, setDifficulty] = useState<Difficulty>("normal");
+  const [target, setTarget] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<BattleResult | null>(null);
 
-  useEffect(() => { battleService.start().then(setBattle); }, []);
-  useEffect(() => { logRef.current?.scrollTo({ top: 9999, behavior: "smooth" }); }, [battle]);
-  useEffect(() => {
-    if (!battle || battle.status !== "victory") return;
-    if (rewardedRef.current === battle.id) return;
-    rewardedRef.current = battle.id;
-    const xp = 60 + battle.enemy.level * 8;
-    const ryous = 40 + battle.enemy.level * 5;
-    const r = gainXp(xp);
-    gainRyous(ryous);
-    toast.success(`Vitória! +${xp} XP, +${ryous} ryous`);
-    if (r.leveledUp) toast.success(`Subiu de nível! Agora você é nível ${r.newLevel}.`);
-  }, [battle, gainXp, gainRyous]);
+  if (!character) return null;
 
-  if (!battle) return <div className="grid h-72 place-items-center text-muted-foreground">Carregando arena...</div>;
-
-  function act(action: "basic" | "defend" | "item" | "flee" | "jutsu", name?: string) {
-    setBattle((b) => (b ? battleService.simulateAction(b, action, name) : b));
-  }
-  async function reset() {
-    const b = await battleService.start();
-    rewardedRef.current = null;
-    setBattle(b);
+  async function fight() {
+    if (!character) return;
+    setBusy(true);
+    setResult(null);
+    try {
+      const r = tab === "npc"
+        ? await npcBattle(character.id, difficulty)
+        : await pvpBattle(character.id, target.trim());
+      setResult(r);
+      const updated = await characterService.get();
+      setCharacter(updated);
+      if (r.result === "Vitoria") {
+        toast.success(`Vitória contra ${r.enemyName}! +${r.xpReward} XP, +${r.ryousReward} ryous`);
+      } else {
+        toast.error(`Derrota para ${r.enemyName}. ${r.ryousReward} ryous`);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha na batalha");
+    } finally { setBusy(false); }
   }
 
   return (
     <div className="space-y-5">
-      <SectionTitle title="Arena" icon={<Swords className="size-6 text-hp" />}
-        description="Batalha por turnos simulada — o backend C# será autoritativo." />
+      <SectionTitle
+        title="Arena"
+        icon={<Swords className="size-6 text-hp" />}
+        description="Batalhas instantâneas — o backend resolve combate baseado em poder, atributos, jutsus e itens."
+      />
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <FighterCard side="player" name={battle.player.name} avatar={battle.player.avatar}
-          hp={battle.player.hp} hpMax={battle.player.hpMax}
-          chakra={battle.player.chakra} chakraMax={battle.player.chakraMax}
-          level={battle.player.level} />
-        <FighterCard side="enemy" name={battle.enemy.name} avatar={battle.enemy.avatar}
-          hp={battle.enemy.hp} hpMax={battle.enemy.hpMax}
-          chakra={battle.enemy.chakra} chakraMax={battle.enemy.chakraMax}
-          level={battle.enemy.level} />
+      <div className="flex gap-2">
+        <Button variant={tab === "npc" ? "default" : "outline"} onClick={() => setTab("npc")}>
+          <Swords className="size-4" /> NPC
+        </Button>
+        <Button variant={tab === "pvp" ? "default" : "outline"} onClick={() => setTab("pvp")}>
+          <Users className="size-4" /> PvP
+        </Button>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-3">
-        <Card className="lg:col-span-2 shadow-card">
-          <CardContent className="space-y-3 p-4">
-            <div className="text-xs uppercase text-muted-foreground">Ações — Turno {battle.turn}</div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              <Button onClick={() => act("basic")} disabled={battle.status !== "ongoing"}><Swords className="size-4" /> Atacar</Button>
-              <Button variant="outline" onClick={() => act("defend")} disabled={battle.status !== "ongoing"}><Shield className="size-4" /> Defender</Button>
-              <Button variant="outline" onClick={() => act("item")} disabled={battle.status !== "ongoing"}><FlaskConical className="size-4" /> Item</Button>
-              <Button variant="ghost" onClick={() => act("flee")} disabled={battle.status !== "ongoing"}><DoorOpen className="size-4" /> Fugir</Button>
-            </div>
-            <div className="text-xs uppercase text-muted-foreground pt-2">Jutsus equipados</div>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {equipped.map((j) => (
-                <Button key={j.id} variant="secondary" className="justify-start"
-                  disabled={battle.status !== "ongoing" || battle.player.chakra < j.chakraCost}
-                  onClick={() => act("jutsu", j.name)}>
-                  <Sparkles className="size-4 text-chakra" />
-                  <span className="flex-1 text-left">{j.name}</span>
-                  <span className="text-[10px] text-muted-foreground">{j.chakraCost} ck</span>
-                </Button>
-              ))}
-            </div>
-            {battle.status !== "ongoing" && (
-              <div className="rounded-lg border border-primary/30 bg-primary/10 p-3 text-center">
-                <div className="text-sm font-bold uppercase text-primary">
-                  {battle.status === "victory" ? "Vitória!" : battle.status === "defeat" ? "Derrota..." : "Você fugiu"}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="shadow-card">
+          <CardContent className="space-y-4 p-5">
+            {tab === "npc" ? (
+              <>
+                <div className="text-sm uppercase text-muted-foreground">Dificuldade</div>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["easy", "normal", "hard"] as Difficulty[]).map((d) => (
+                    <Button
+                      key={d}
+                      size="sm"
+                      variant={difficulty === d ? "default" : "outline"}
+                      onClick={() => setDifficulty(d)}
+                    >
+                      {d === "easy" ? "Fácil" : d === "normal" ? "Normal" : "Difícil"}
+                    </Button>
+                  ))}
                 </div>
-                <Button size="sm" className="mt-2" onClick={reset}><RefreshCcw className="size-4" /> Nova batalha</Button>
-              </div>
+                <p className="text-xs text-muted-foreground">
+                  Fácil: nível -1 a -10. Normal: ±3. Difícil: +1 a +10. Recompensas escalam com a dificuldade.
+                </p>
+                <Button onClick={fight} disabled={busy} className="w-full">
+                  {busy ? <Loader2 className="size-4 animate-spin" /> : <Swords className="size-4" />}
+                  Batalhar contra NPC
+                </Button>
+              </>
+            ) : (
+              <>
+                <div className="text-sm uppercase text-muted-foreground">Alvo PvP</div>
+                <Input
+                  placeholder="Nome do personagem"
+                  value={target}
+                  onChange={(e) => setTarget(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Ataca outro jogador. Vitória/derrota é decidida pelo poder de combate de ambos.
+                </p>
+                <Button onClick={fight} disabled={busy || target.trim().length < 2} className="w-full">
+                  {busy ? <Loader2 className="size-4 animate-spin" /> : <Users className="size-4" />}
+                  Atacar jogador
+                </Button>
+              </>
             )}
           </CardContent>
         </Card>
 
         <Card className="shadow-card">
-          <CardContent className="p-3">
-            <div className="mb-2 text-xs uppercase text-muted-foreground">Log da batalha</div>
-            <div ref={logRef} className="scroll-thin h-72 space-y-1 overflow-y-auto pr-2 text-xs">
-              {battle.log.map((l) => (
-                <div key={l.id} className={
-                  l.actor === "player" ? "text-foreground" :
-                  l.actor === "enemy" ? "text-destructive" : "text-muted-foreground italic"
-                }>
-                  <span className="text-[10px] tabular-nums text-muted-foreground">[T{l.turn}]</span> {l.message}
-                  {typeof l.damage === "number" && (
-                    <span className={`ml-1 font-bold ${l.damage < 0 ? "text-xp" : "text-hp"}`}>
-                      {l.damage < 0 ? `+${-l.damage}` : `-${l.damage}`}
-                    </span>
-                  )}
+          <CardContent className="space-y-3 p-5 text-sm">
+            <div className="text-xs uppercase text-muted-foreground">Resultado</div>
+            {!result ? (
+              <div className="grid h-40 place-items-center text-muted-foreground">
+                Nenhum combate ainda
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2">
+                  {result.result === "Vitoria"
+                    ? <Trophy className="size-5 text-primary" />
+                    : <Skull className="size-5 text-destructive" />}
+                  <span className="text-lg font-bold">
+                    {result.result === "Vitoria" ? "Vitória" : "Derrota"}
+                  </span>
+                  <span className="ml-auto text-xs text-muted-foreground">{result.difficulty}</span>
                 </div>
-              ))}
-            </div>
+                <Row label="Inimigo" value={`${result.enemyName} (Lv ${result.enemyLevel})`} />
+                <Row label="Seu poder" value={result.playerPower.toLocaleString()} />
+                <Row label="Poder inimigo" value={result.enemyPower.toLocaleString()} />
+                <Row label="Comparação" value={result.powerComparison} />
+                <Row label="XP" value={result.xpReward >= 0 ? `+${result.xpReward}` : String(result.xpReward)} />
+                <Row label="Ryous" value={result.ryousReward >= 0 ? `+${result.ryousReward}` : String(result.ryousReward)} />
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -125,25 +143,11 @@ function BattlePage() {
   );
 }
 
-function FighterCard({ side, name, avatar, hp, hpMax, chakra, chakraMax, level }: {
-  side: "player" | "enemy"; name: string; avatar: string;
-  hp: number; hpMax: number; chakra: number; chakraMax: number; level: number;
-}) {
+function Row({ label, value }: { label: string; value: string }) {
   return (
-    <Card className={`bg-scroll-paper shadow-card ${side === "enemy" ? "border-destructive/30" : "border-primary/30"}`}>
-      <CardContent className="flex items-center gap-4 p-4">
-        <div className={`grid size-20 place-items-center rounded-2xl text-4xl ring-2 ${side === "enemy" ? "bg-destructive/20 ring-destructive/40" : "bg-primary/20 ring-primary/40"}`}>
-          {avatar}
-        </div>
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-bold">{name}</span>
-            <span className="text-xs text-muted-foreground">Lv {level}</span>
-          </div>
-          <StatBar value={hp} max={hpMax} tone="hp" label="HP" />
-          <StatBar value={chakra} max={chakraMax} tone="chakra" label="Chakra" />
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex items-center justify-between border-b border-border/40 pb-1 last:border-0">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-bold tabular-nums">{value}</span>
+    </div>
   );
 }

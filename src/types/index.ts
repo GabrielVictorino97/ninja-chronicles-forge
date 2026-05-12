@@ -269,10 +269,14 @@ export interface HuntStatus {
   endTime: string;
   secondsRemaining: number;
   availableDurations: number[];
+  todayHuntsUsed: number;
+  todayHuntsRemaining: number;
+  totalAvailableMinutes: number;
 }
 
 export interface ElementOption {
   name: ElementAffinity;
   description: string;
   requiredLevel: number;
+  learned: boolean;
 }

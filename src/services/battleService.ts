@@ -1,6 +1,28 @@
 import { mockBattle } from "@/mocks/battle";
 import type { Battle, BattleLogEntry } from "@/types";
-import { mockRequest } from "./api";
+import { mockRequest, apiClient } from "./api";
+
+export type Difficulty = "easy" | "normal" | "hard";
+
+export interface BattleResult {
+  result: "Vitoria" | "Derrota" | string;
+  enemyName: string;
+  enemyLevel: number;
+  difficulty: string;
+  xpReward: number;
+  ryousReward: number;
+  playerLevel: number;
+  playerGraduation: string;
+  playerPower: number;
+  enemyPower: number;
+  powerComparison: string;
+}
+
+export const npcBattle = (characterId: string, difficulty: Difficulty) =>
+  apiClient.post<BattleResult>(`/characters/${characterId}/battles/npc`, { difficulty });
+
+export const pvpBattle = (characterId: string, targetName: string) =>
+  apiClient.post<BattleResult>(`/characters/${characterId}/battles/pvp`, { targetName });
 
 // Frontend-only simulation. Real damage formulas, RNG seeds, status effects,
 // and validations will be authoritative on the C# backend.

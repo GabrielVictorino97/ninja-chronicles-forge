@@ -29,6 +29,8 @@ import { Route as AppMissionsRouteImport } from './routes/_app.missions'
 import { Route as AppMapRouteImport } from './routes/_app.map'
 import { Route as AppJutsusRouteImport } from './routes/_app.jutsus'
 import { Route as AppInventoryRouteImport } from './routes/_app.inventory'
+import { Route as AppHuntRouteImport } from './routes/_app.hunt'
+import { Route as AppElementsRouteImport } from './routes/_app.elements'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppClanRouteImport } from './routes/_app.clan'
 import { Route as AppCharacterRouteImport } from './routes/_app.character'
@@ -133,6 +135,16 @@ const AppInventoryRoute = AppInventoryRouteImport.update({
   path: '/inventory',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHuntRoute = AppHuntRouteImport.update({
+  id: '/hunt',
+  path: '/hunt',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppElementsRoute = AppElementsRouteImport.update({
+  id: '/elements',
+  path: '/elements',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -164,6 +176,8 @@ export interface FileRoutesByFullPath {
   '/character': typeof AppCharacterRoute
   '/clan': typeof AppClanRoute
   '/dashboard': typeof AppDashboardRoute
+  '/elements': typeof AppElementsRoute
+  '/hunt': typeof AppHuntRoute
   '/inventory': typeof AppInventoryRoute
   '/jutsus': typeof AppJutsusRoute
   '/map': typeof AppMapRoute
@@ -188,6 +202,8 @@ export interface FileRoutesByTo {
   '/character': typeof AppCharacterRoute
   '/clan': typeof AppClanRoute
   '/dashboard': typeof AppDashboardRoute
+  '/elements': typeof AppElementsRoute
+  '/hunt': typeof AppHuntRoute
   '/inventory': typeof AppInventoryRoute
   '/jutsus': typeof AppJutsusRoute
   '/map': typeof AppMapRoute
@@ -215,6 +231,8 @@ export interface FileRoutesById {
   '/_app/character': typeof AppCharacterRoute
   '/_app/clan': typeof AppClanRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/elements': typeof AppElementsRoute
+  '/_app/hunt': typeof AppHuntRoute
   '/_app/inventory': typeof AppInventoryRoute
   '/_app/jutsus': typeof AppJutsusRoute
   '/_app/map': typeof AppMapRoute
@@ -242,6 +260,8 @@ export interface FileRouteTypes {
     | '/character'
     | '/clan'
     | '/dashboard'
+    | '/elements'
+    | '/hunt'
     | '/inventory'
     | '/jutsus'
     | '/map'
@@ -266,6 +286,8 @@ export interface FileRouteTypes {
     | '/character'
     | '/clan'
     | '/dashboard'
+    | '/elements'
+    | '/hunt'
     | '/inventory'
     | '/jutsus'
     | '/map'
@@ -292,6 +314,8 @@ export interface FileRouteTypes {
     | '/_app/character'
     | '/_app/clan'
     | '/_app/dashboard'
+    | '/_app/elements'
+    | '/_app/hunt'
     | '/_app/inventory'
     | '/_app/jutsus'
     | '/_app/map'
@@ -459,6 +483,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInventoryRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/hunt': {
+      id: '/_app/hunt'
+      path: '/hunt'
+      fullPath: '/hunt'
+      preLoaderRoute: typeof AppHuntRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/elements': {
+      id: '/_app/elements'
+      path: '/elements'
+      fullPath: '/elements'
+      preLoaderRoute: typeof AppElementsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -495,6 +533,8 @@ interface AppRouteChildren {
   AppCharacterRoute: typeof AppCharacterRoute
   AppClanRoute: typeof AppClanRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppElementsRoute: typeof AppElementsRoute
+  AppHuntRoute: typeof AppHuntRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppJutsusRoute: typeof AppJutsusRoute
   AppMapRoute: typeof AppMapRoute
@@ -509,6 +549,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppCharacterRoute: AppCharacterRoute,
   AppClanRoute: AppClanRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppElementsRoute: AppElementsRoute,
+  AppHuntRoute: AppHuntRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppJutsusRoute: AppJutsusRoute,
   AppMapRoute: AppMapRoute,
