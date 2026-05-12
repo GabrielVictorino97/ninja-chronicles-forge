@@ -19,7 +19,10 @@ export const characterService = {
     return apiClient.post<Character>("/characters", input);
   },
   distributePoints(attributes: Partial<BaseAttributes>): Promise<Character> {
-    return apiClient.put<Character>("/characters/me/attributes", { attributes });
+    return apiClient.put<Character>(
+      `/characters/${arguments[1] ?? ""}/attributes`,
+      { attributes },
+    );
   },
   listVillages(): Promise<Village[]> {
     return apiClient.get<Village[]>("/villages", { auth: false });
@@ -30,7 +33,7 @@ export const characterService = {
   listElements(): Promise<ElementOption[]> {
     return apiClient.get<ElementOption[]>("/elements", { auth: false });
   },
-  learnElement(element: string): Promise<void> {
-    return apiClient.post<void>(`/elements/${element}/learn`);
+  learnElement(characterId: string, element: string): Promise<void> {
+    return apiClient.post<void>(`/characters/${characterId}/elements/${element}/learn`);
   },
 };
