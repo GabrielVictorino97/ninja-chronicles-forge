@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard, User, ScrollText, Swords, Sparkles, Backpack,
   Store, Users, Trophy, Map as MapIcon, Bell, LogOut, Menu, X,
-  Coins, Flame, Droplets, Zap, Star,
+  Coins, Flame, Droplets, Zap, Star, Crosshair,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/store/gameStore";
@@ -20,8 +20,10 @@ const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/character", label: "Personagem", icon: User },
   { to: "/missions", label: "Missões", icon: ScrollText },
+  { to: "/hunt", label: "Caçada", icon: Crosshair },
   { to: "/battle", label: "Batalha", icon: Swords },
   { to: "/jutsus", label: "Jutsus", icon: Sparkles },
+  { to: "/elements", label: "Elementos", icon: Flame },
   { to: "/inventory", label: "Inventário", icon: Backpack },
   { to: "/shop", label: "Loja", icon: Store },
   { to: "/clan", label: "Clã", icon: Users },
