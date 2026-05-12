@@ -278,4 +278,5 @@ export interface ElementOption {
   name: ElementAffinity;
   description: string;
   requiredLevel: number;
+  learned: boolean;
 }
