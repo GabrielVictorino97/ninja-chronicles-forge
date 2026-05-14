@@ -37,7 +37,7 @@ function InventoryPage() {
     inventoryService.list(character.id).then(({ items, catalog: cat }) => {
       setInvItems(items);
       setCatalog(cat);
-    }).finally(() => setLoading(false));
+    }).catch(() => { setInvItems([]); setCatalog([]); }).finally(() => setLoading(false));
   }, [character?.id]);
 
   const merged = invItems.map((inv) => ({

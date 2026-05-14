@@ -33,7 +33,7 @@ function JutsusPage() {
     ]).then(([all, mine]) => {
       setAllJutsus(all);
       setMyJutsus(mine);
-    }).finally(() => setLoading(false));
+    }).catch(() => { setAllJutsus([]); setMyJutsus([]); }).finally(() => setLoading(false));
   }, [character?.id]);
 
   const learnedIds = new Set(myJutsus.map(j => j.id));

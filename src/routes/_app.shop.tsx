@@ -22,7 +22,7 @@ function ShopPage() {
   const [history, setHistory] = useState<{ id: string; type: "buy"; name: string; price: number; date: string }[]>([]);
 
   useEffect(() => {
-    shopService.list().then(setItems).finally(() => setLoading(false));
+    shopService.list().then(setItems).catch(() => setItems([])).finally(() => setLoading(false));
   }, []);
 
   async function buy(itemId: string, name: string, price: number) {

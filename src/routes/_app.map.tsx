@@ -45,7 +45,7 @@ function MapPage() {
                 <p className="text-xs text-muted-foreground">{l.description}</p>
                 <div className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">Inimigos:</span> {l.enemies.join(", ")}</div>
                 <div className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">Missões:</span> {l.missionIds.length || "—"}</div>
-                <Button size="sm" className="w-full" onClick={async () => { await worldService.travel(l.id); toast.success(`Viajando para ${l.name}...`); }}>
+                <Button size="sm" className="w-full" onClick={async () => { try { await worldService.travel(l.id); toast.success(`Viajando para ${l.name}...`); } catch (e) { toast.error(e instanceof Error ? e.message : "Erro ao viajar"); } }}>
                   <Plane className="size-3.5" /> Viajar
                 </Button>
               </CardContent>

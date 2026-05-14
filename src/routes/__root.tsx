@@ -115,13 +115,12 @@ function RootComponent() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    // MSW só roda quando VITE_USE_MOCKS=true. Por padrão chamamos o backend real
-    // (.NET) em VITE_API_BASE_URL — mocks ativos faziam algumas telas devolverem
-    // 404/dados inconsistentes em cima das rotas reais.
     if (import.meta.env.VITE_USE_MOCKS === "true") {
       import("@/mocks/browser")
         .then((m) => m.worker.start({ onUnhandledRequest: "bypass" }))
-        .catch(() => {});
+        .catch((err) => {
+          console.error("[MSW] Failed to start mock service worker:", err);
+        });
     }
   }, []);
 

@@ -22,7 +22,7 @@ function ClanPage() {
   const [donate, setDonate] = useState(100);
 
   useEffect(() => {
-    clanService.getMine().then(setClan).finally(() => setLoading(false));
+    clanService.getMine().then(setClan).catch(() => setClan(null)).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="size-8 animate-spin text-muted-foreground" /></div>;

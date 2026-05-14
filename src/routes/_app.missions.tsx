@@ -26,7 +26,7 @@ function MissionsPage() {
   const gainRyous = useGameStore((s) => s.gainRyous);
 
   useEffect(() => {
-    missionService.list().then(setMissions).finally(() => setLoading(false));
+    missionService.list().then(setMissions).catch(() => setMissions([])).finally(() => setLoading(false));
   }, []);
 
   const list = missions.filter((m) => filter === "ALL" || m.rank === filter);
