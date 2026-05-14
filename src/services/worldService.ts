@@ -13,7 +13,7 @@ interface LocationDto {
 
 export const worldService = {
   async listLocations(): Promise<Location[]> {
-    return apiClient.get<Location[]>("world/locations", { auth: false });
+    return apiClient.get<Location[]>("/world/locations", { auth: false });
   },
   async travel(locationId: string): Promise<{ ok: boolean; locationId: string }> {
     return apiClient.post(`/world/travel/${locationId}`);
