@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { adminCharacterService } from "@/services/admin";
-import { mockVillages } from "@/mocks/villages";
-import { mockBloodlineClans } from "@/mocks/clans";
+import { adminCharacterService, adminVillageService, adminBloodlineClanService } from "@/services/admin";
 import { DataTable, PageHeader, StatusPill } from "@/components/admin/DataTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +17,10 @@ export const Route = createFileRoute("/admin/characters")({ component: Character
 function CharactersPage() {
   const qc = useQueryClient();
   const { data = [] } = useQuery({ queryKey: ["admin-characters"], queryFn: () => adminCharacterService.list() });
+  const { data: villages = [] } = useQuery({ queryKey: ["admin-villages-list"], queryFn: () => adminVillageService.list() });
+  const { data: clans = [] } = useQuery({ queryKey: ["admin-clans-list"], queryFn: () => adminBloodlineClanService.list() });
+  const villageById = useMemo(() => new Map(villages.map(v => [v.id, v])), [villages]);
+  const clanById = useMemo(() => new Map(clans.map(c => [c.id, c])), [clans]);
   const [search, setSearch] = useState("");
   const [village, setVillage] = useState("all");
   const [edit, setEdit] = useState<AdminCharacter | null>(null);
@@ -56,7 +58,7 @@ function CharactersPage() {
           <SelectTrigger className="md:w-52"><SelectValue placeholder="Vila" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todas as vilas</SelectItem>
-            {mockVillages.map((v) => <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>)}
+            {villages.map((v) => <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -66,8 +68,8 @@ function CharactersPage() {
         columns={[
           { key: "name", label: "Nome" },
           { key: "userName", label: "Usuário" },
-          { key: "villageId", label: "Vila", render: (c) => mockVillages.find((v) => v.id === c.villageId)?.name },
-          { key: "clanId", label: "Clã", render: (c) => mockBloodlineClans.find((v) => v.id === c.clanId)?.name },
+          { key: "villageId", label: "Vila", render: (c) => villageById.get(c.villageId)?.name ?? c.villageId },
+          { key: "clanId", label: "Clã", render: (c) => clanById.get(c.clanId)?.name ?? c.clanId },
           { key: "level", label: "Lv" },
           { key: "graduation", label: "Graduação" },
           { key: "power", label: "Poder", render: (c) => c.power.toLocaleString() },

@@ -1,15 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SectionTitle } from "@/components/game/SectionTitle";
 import { RankBadge } from "@/components/game/RankBadge";
-import { mockMissions } from "@/mocks/missions";
 import { missionService } from "@/services/missionService";
 import { useGameStore } from "@/store/gameStore";
-import { ScrollText, Coins, Zap, Star, Play, Check } from "lucide-react";
+import { ScrollText, Coins, Zap, Star, Play, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import type { Rank } from "@/types";
+import type { Mission, Rank } from "@/types";
 
 export const Route = createFileRoute("/_app/missions")({
   component: MissionsPage,
@@ -19,24 +18,44 @@ export const Route = createFileRoute("/_app/missions")({
 const RANKS: Rank[] = ["D", "C", "B", "A", "S"];
 
 function MissionsPage() {
+  const [missions, setMissions] = useState<Mission[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Rank | "ALL">("ALL");
-  const list = mockMissions.filter((m) => filter === "ALL" || m.rank === filter);
+  const character = useGameStore((s) => s.character);
   const gainXp = useGameStore((s) => s.gainXp);
   const gainRyous = useGameStore((s) => s.gainRyous);
 
-  async function start(id: string, title: string) {
-    await missionService.start(id);
-    toast.info(`Missão iniciada: ${title}`);
-  }
-  async function complete(id: string) {
-    const r = await missionService.complete(id);
-    const result = gainXp(r.xp);
-    gainRyous(r.ryous);
-    toast.success(`Missão concluída! +${r.xp} XP, +${r.ryous} ryous`);
-    if (result.leveledUp) {
-      toast.success(`Subiu de nível! Agora você é nível ${result.newLevel}.`);
+  useEffect(() => {
+    missionService.list().then(setMissions).finally(() => setLoading(false));
+  }, []);
+
+  const list = missions.filter((m) => filter === "ALL" || m.rank === filter);
+
+  async function start(missionId: string, title: string) {
+    if (!character) return;
+    try {
+      await missionService.start(character.id, missionId);
+      toast.info(`Missão iniciada: ${title}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao iniciar missão");
     }
   }
+  async function complete(missionId: string) {
+    if (!character) return;
+    try {
+      const r = await missionService.complete(character.id, missionId);
+      const result = gainXp(r.xp);
+      gainRyous(r.ryous);
+      toast.success(`Missão concluída! +${r.xp} XP, +${r.ryous} ryous`);
+      if (result.leveledUp) {
+        toast.success(`Subiu de nível! Agora você é nível ${result.newLevel}.`);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao concluir missão");
+    }
+  }
+
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="size-8 animate-spin text-muted-foreground" /></div>;
 
   return (
     <div className="space-y-5">

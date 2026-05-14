@@ -23,14 +23,7 @@ export type ElementAffinity =
   | "Fuuton"
   | "Raiton";
 
-export type VillageId =
-  | "konoha"
-  | "suna"
-  | "kiri"
-  | "kumo"
-  | "iwa"
-  | "ame"
-  | "oto";
+export type VillageId = string;
 
 export interface Village {
   id: VillageId;
@@ -42,10 +35,7 @@ export interface Village {
   accentColor: string; // semantic token name
 }
 
-export type BloodlineClanId =
-  | "uchiha" | "hyuga" | "uzumaki" | "senju" | "nara" | "akimichi"
-  | "yamanaka" | "aburame" | "inuzuka" | "sarutobi" | "kaguya"
-  | "hozuki" | "hatake" | "sabaku";
+export type BloodlineClanId = string;
 
 export interface BloodlineClan {
   id: BloodlineClanId;

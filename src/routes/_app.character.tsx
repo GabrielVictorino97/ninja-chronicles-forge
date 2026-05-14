@@ -1,15 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGameStore } from "@/store/gameStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SectionTitle } from "@/components/game/SectionTitle";
 import { StatBar } from "@/components/game/StatBar";
-import type { BaseAttributes, DerivedAttributes } from "@/types";
-import { mockCharacter } from "@/mocks/character";
-import { mockVillages } from "@/mocks/villages";
-import { mockBloodlineClans } from "@/mocks/clans";
-import { User, Plus, Minus, Save } from "lucide-react";
+import type { BaseAttributes, DerivedAttributes, Village, BloodlineClan } from "@/types";
+import { characterService } from "@/services/characterService";
+import { User, Plus, Minus, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const ATTR_LABELS: Record<keyof BaseAttributes, string> = {
@@ -52,9 +50,28 @@ export const Route = createFileRoute("/_app/character")({
 });
 
 function CharacterPage() {
-  const stored = useGameStore((s) => s.character) ?? mockCharacter;
+  const stored = useGameStore((s) => s.character);
   const patch = useGameStore((s) => s.patchCharacter);
-  const [draft, setDraft] = useState(stored.attributes);
+  const [villages, setVillages] = useState<Village[]>([]);
+  const [clans, setClans] = useState<BloodlineClan[]>([]);
+  const [draft, setDraft] = useState<BaseAttributes | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [initialized, setInitialized] = useState(false);
+
+  useEffect(() => {
+    Promise.all([characterService.listVillages(), characterService.listBloodlineClans()])
+      .then(([v, c]) => { setVillages(v); setClans(c); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (stored && !initialized) {
+      setDraft(stored.attributes);
+      setInitialized(true);
+    }
+  }, [stored, initialized]);
+
+  if (!stored || !draft) return null;
   const used = (Object.keys(draft) as (keyof BaseAttributes)[]).reduce(
     (sum, k) => sum + (draft[k] - stored.attributes[k]), 0,
   );
@@ -62,9 +79,18 @@ function CharacterPage() {
   const derived = deriveAttributes(draft, stored.level);
   const nextGrad = NEXT_GRAD[stored.graduation];
 
-  function save() {
-    patch({ attributes: draft, unspentPoints: remaining });
-    toast.success("Atributos atualizados!");
+  async function save() {
+    if (!stored || !draft) return;
+    setSaving(true);
+    try {
+      const updated = await characterService.distributePoints(stored.id, draft);
+      patch({ attributes: draft, unspentPoints: updated.unspentPoints ?? remaining });
+      toast.success("Atributos salvos!");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao salvar atributos");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -78,7 +104,7 @@ function CharacterPage() {
             <div className="grid size-20 place-items-center rounded-2xl bg-primary/20 text-4xl ring-2 ring-primary/40">{stored.avatar}</div>
             <div>
               <div className="text-xl font-black">{stored.name}</div>
-              <div className="text-sm text-muted-foreground">{mockVillages.find(v => v.id === stored.villageId)?.name} • {mockBloodlineClans.find(c => c.id === stored.clanId)?.name}</div>
+              <div className="text-sm text-muted-foreground">{villages.find(v => v.id === stored.villageId)?.name ?? "Vila"} • {clans.find(c => c.id === stored.clanId)?.name ?? "Clã"}</div>
               <div className="text-xs text-muted-foreground">Graduação: <span className="font-semibold text-primary">{stored.graduation}</span></div>
             </div>
           </div>
@@ -103,8 +129,8 @@ function CharacterPage() {
             <CardTitle>Atributos base</CardTitle>
             <div className="flex items-center gap-2">
               <span className="rounded-md bg-primary/15 px-2 py-1 text-xs font-bold text-primary">Pontos: {remaining}</span>
-              <Button size="sm" disabled={remaining < 0 || used === 0} onClick={save}>
-                <Save className="size-4" /> Salvar
+              <Button size="sm" disabled={remaining < 0 || used === 0 || saving} onClick={save}>
+                {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />} Salvar
               </Button>
             </div>
           </CardHeader>

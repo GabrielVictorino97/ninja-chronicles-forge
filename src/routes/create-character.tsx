@@ -1,18 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { mockVillages } from "@/mocks/villages";
-import { mockBloodlineClans } from "@/mocks/clans";
 import { cn } from "@/lib/utils";
-import type { BloodlineClanId, VillageId, BaseAttributes } from "@/types";
+import type { BloodlineClanId, VillageId, BaseAttributes, Village, BloodlineClan } from "@/types";
 import { useGameStore } from "@/store/gameStore";
 import { characterService } from "@/services/characterService";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 
 const AVATARS = ["🦊", "🐉", "🐺", "🦅", "🐍", "🐢", "🦂", "🐅", "🦉", "🐝", "🦇", "🐲"];
 const ATTR_LABELS: Record<keyof BaseAttributes, string> = {
@@ -30,7 +28,15 @@ export const Route = createFileRoute("/create-character")({
 function CreateCharacterPage() {
   const navigate = useNavigate();
   const setCharacter = useGameStore((s) => s.setCharacter);
+  const [villages, setVillages] = useState<Village[] | null>(null);
+  const [clans, setClans] = useState<BloodlineClan[] | null>(null);
   const [step, setStep] = useState(1);
+
+  useEffect(() => {
+    Promise.all([characterService.listVillages(), characterService.listBloodlineClans()])
+      .then(([v, c]) => { setVillages(v); setClans(c); })
+      .catch(() => { setVillages([]); setClans([]); });
+  }, []);
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState(AVATARS[0]);
   const [village, setVillage] = useState<VillageId | null>(null);
@@ -114,7 +120,9 @@ function CreateCharacterPage() {
 
           {step === 2 && (
             <div className="grid gap-3 sm:grid-cols-2">
-              {mockVillages.map((v) => (
+              {!villages ? (
+                <div className="col-span-full grid h-40 place-items-center"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>
+              ) : villages.map((v) => (
                 <button key={v.id} onClick={() => setVillage(v.id)}
                   className={cn(
                     "flex items-start gap-3 rounded-xl border bg-muted/40 p-4 text-left transition",
@@ -133,7 +141,9 @@ function CreateCharacterPage() {
 
           {step === 3 && (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {mockBloodlineClans.map((c) => (
+              {!clans ? (
+                <div className="col-span-full grid h-40 place-items-center"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>
+              ) : clans.map((c) => (
                 <button key={c.id} onClick={() => setClan(c.id)}
                   className={cn(
                     "flex flex-col items-start gap-2 rounded-xl border bg-muted/40 p-4 text-left transition",

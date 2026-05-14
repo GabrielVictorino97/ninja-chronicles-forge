@@ -28,7 +28,7 @@ export const characterService = {
     return apiClient.get<BloodlineClan[]>("/bloodline-clans", { auth: false });
   },
   listElements(): Promise<ElementOption[]> {
-    return apiClient.get<ElementOption[]>("/elements", { auth: false });
+    return apiClient.get<ElementOption[]>("/elements");
   },
   learnElement(characterId: string, element: string): Promise<void> {
     return apiClient.post<void>(`/characters/${characterId}/elements/${element}/learn`);

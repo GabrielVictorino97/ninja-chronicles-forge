@@ -1,8 +1,7 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Users, UserCircle, MapPin, Dna, Sparkles,
-  Scroll, Package, CalendarRange, Swords, Trophy, FileClock,
-  Settings, Search, Bell, Menu, LogOut, Shield,
+  LayoutDashboard, Users, UserCircle, MapPin,
+  Swords, Trophy, Search, Bell, Menu, LogOut, Shield,
 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -19,15 +18,8 @@ const NAV = [
   { to: "/admin/users", label: "Usuários", icon: Users },
   { to: "/admin/characters", label: "Personagens", icon: UserCircle },
   { to: "/admin/villages", label: "Vilas", icon: MapPin },
-  { to: "/admin/bloodline-clans", label: "Clãs de Sangue", icon: Dna },
-  { to: "/admin/jutsus", label: "Jutsus", icon: Sparkles },
-  { to: "/admin/missions", label: "Missões", icon: Scroll },
-  { to: "/admin/items", label: "Itens", icon: Package },
-  { to: "/admin/events", label: "Eventos", icon: CalendarRange },
   { to: "/admin/battles", label: "Batalhas", icon: Swords },
   { to: "/admin/rankings", label: "Rankings", icon: Trophy },
-  { to: "/admin/audit-logs", label: "Audit Logs", icon: FileClock },
-  { to: "/admin/settings", label: "Configurações", icon: Settings },
 ] as const;
 
 export function AdminLayout() {

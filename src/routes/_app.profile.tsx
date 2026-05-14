@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { SectionTitle } from "@/components/game/SectionTitle";
 import { useGameStore } from "@/store/gameStore";
-import { mockUser, mockCharacter } from "@/mocks/character";
 import { User, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -20,12 +19,14 @@ export const Route = createFileRoute("/_app/profile")({
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const user = useGameStore((s) => s.user) ?? mockUser;
-  const character = useGameStore((s) => s.character) ?? mockCharacter;
+  const user = useGameStore((s) => s.user);
+  const character = useGameStore((s) => s.character);
   const patch = useGameStore((s) => s.patchCharacter);
   const logout = useGameStore((s) => s.logout);
   const [sound, setSound] = useState(true);
   const [notif, setNotif] = useState(true);
+
+  if (!user || !character) return null;
 
   return (
     <div className="space-y-5">

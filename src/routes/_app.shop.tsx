@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SectionTitle } from "@/components/game/SectionTitle";
 import { RarityBadge } from "@/components/game/RarityBadge";
-import { mockItems } from "@/mocks/items";
 import { shopService } from "@/services/shopService";
-import { Store, Coins } from "lucide-react";
+import { useGameStore } from "@/store/gameStore";
+import type { Item } from "@/types";
+import { Store, Coins, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/shop")({
@@ -15,21 +16,41 @@ export const Route = createFileRoute("/_app/shop")({
 });
 
 function ShopPage() {
-  const [history, setHistory] = useState<{ id: string; type: "buy" | "sell"; name: string; price: number; date: string }[]>([]);
+  const character = useGameStore((s) => s.character);
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [history, setHistory] = useState<{ id: string; type: "buy"; name: string; price: number; date: string }[]>([]);
+
+  useEffect(() => {
+    shopService.list().then(setItems).finally(() => setLoading(false));
+  }, []);
 
   async function buy(itemId: string, name: string, price: number) {
-    await shopService.buy(itemId);
-    setHistory((h) => [{ id: `${Date.now()}`, type: "buy", name, price, date: "agora" }, ...h]);
-    toast.success(`Comprou ${name}`);
+    if (!character) return;
+    try {
+      await shopService.buy(character.id, itemId);
+      setHistory((h) => [{ id: `${Date.now()}`, type: "buy", name, price, date: "agora" }, ...h]);
+      toast.success(`Comprou ${name}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao comprar item");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   return (
     <div className="space-y-5">
       <SectionTitle title="Loja" icon={<Store className="size-6 text-ryous" />}
-        description="Compre e venda equipamentos." />
+        description="Compre equipamentos." />
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {mockItems.map((it) => (
+          {items.map((it) => (
             <Card key={it.id} className="bg-scroll-paper shadow-card">
               <CardContent className="space-y-2 p-4">
                 <div className="flex items-start justify-between">
@@ -42,7 +63,6 @@ function ShopPage() {
                 <p className="text-xs text-muted-foreground">{it.description}</p>
                 <div className="flex gap-2">
                   <Button size="sm" className="flex-1" onClick={() => buy(it.id, it.name, it.price)}>Comprar</Button>
-                  <Button size="sm" variant="outline" className="flex-1" onClick={async () => { await shopService.sell(it.id); toast.success(`Vendeu ${it.name}`); }}>Vender</Button>
                 </div>
               </CardContent>
             </Card>
@@ -57,7 +77,7 @@ function ShopPage() {
               <div className="space-y-1.5">
                 {history.map((h) => (
                   <div key={h.id} className="flex items-center justify-between rounded border bg-muted/30 px-2 py-1.5 text-xs">
-                    <span><span className={h.type === "buy" ? "text-destructive" : "text-xp"}>{h.type === "buy" ? "−" : "+"}</span> {h.name}</span>
+                    <span><span className="text-destructive">−</span> {h.name}</span>
                     <span className="font-semibold tabular-nums text-ryous">{h.price}</span>
                   </div>
                 ))}

@@ -1,12 +1,14 @@
 // HTTP client for the Ninja Chronicles backend (.NET 8 + FastEndpoints).
-// - Reads VITE_API_BASE_URL (default https://localhost:7259/api)
+// - Reads VITE_API_BASE_URL (default http://localhost:5271/api)
 // - Injects JWT access token, persists tokens in localStorage
 // - Auto-refreshes on 401 using /auth/refresh and replays the request once
 // - Throws ApiError with backend FluentValidation-style errors
 
+import { logger } from "@/lib/logger";
+
 const BASE_URL =
   (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
-  "https://localhost:7259/api";
+  "http://localhost:5271/api";
 
 const ACCESS_KEY = "ncf.accessToken";
 const REFRESH_KEY = "ncf.refreshToken";
@@ -74,6 +76,11 @@ async function parseBody(res: Response): Promise<ApiErrorBody | string | null> {
 
 let refreshing: Promise<boolean> | null = null;
 
+let onSessionExpiredHandler: (() => void) | null = null;
+export function onSessionExpired(fn: () => void) {
+  onSessionExpiredHandler = fn;
+}
+
 async function tryRefresh(): Promise<boolean> {
   if (refreshing) return refreshing;
   const access = tokenStorage.access;
@@ -86,7 +93,7 @@ async function tryRefresh(): Promise<boolean> {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accessToken: access, refreshToken: refresh }),
       });
-      if (!res.ok) return false;
+      if (!res.ok) { tokenStorage.clear(); return false; }
       const data = (await res.json()) as { accessToken: string; refreshToken: string };
       tokenStorage.set(data.accessToken, data.refreshToken);
       return true;
@@ -126,7 +133,36 @@ export async function api<T = unknown>(path: string, opts: ApiOptions = {}): Pro
     body: body !== undefined ? JSON.stringify(body) : undefined,
   };
 
-  let res = await fetch(url, init);
+  // Retry up to 3 times on network errors — MSW worker may still be starting.
+  async function doFetch(attempts = 3): Promise<Response> {
+    for (let i = 0; i < attempts; i++) {
+      try {
+        return await fetch(url, init);
+      } catch {
+        if (i === attempts - 1) {
+          logger.error(`API offline: ${method} ${path}`, undefined, {
+            BaseUrl: BASE_URL,
+            Method: method,
+            Path: path,
+          });
+          throw new ApiError(0,
+            `Servidor inacessível (${BASE_URL}). Verifique se o backend está rodando.`,
+            null);
+        }
+        await new Promise((r) => setTimeout(r, 300));
+      }
+    }
+    throw new ApiError(0,
+      `Servidor inacessível (${BASE_URL}). Verifique se o backend está rodando.`,
+      null);
+  }
+
+  let res: Response;
+  try {
+    res = await doFetch();
+  } catch (err) {
+    throw err;
+  }
 
   if (res.status === 401 && auth && !skipRefresh) {
     const ok = await tryRefresh();
@@ -134,14 +170,28 @@ export async function api<T = unknown>(path: string, opts: ApiOptions = {}): Pro
       const retryHeaders = { ...headers };
       const newToken = tokenStorage.access;
       if (newToken) retryHeaders["Authorization"] = `Bearer ${newToken}`;
-      res = await fetch(url, { ...init, headers: retryHeaders });
+      try {
+        res = await doFetch(1);
+      } catch {
+        logger.error(`API offline (retry): ${method} ${path}`);
+        throw new ApiError(0,
+          `Servidor inacessível (${BASE_URL}). Verifique se o backend está rodando.`,
+          null);
+      }
     } else {
       tokenStorage.clear();
+      onSessionExpiredHandler?.();
     }
   }
 
   if (!res.ok) {
     const errBody = await parseBody(res);
+    logger.warn(`API ${res.status}: ${method} ${path}`, {
+      Status: res.status,
+      Method: method,
+      Path: path,
+      Body: errBody,
+    });
     throw new ApiError(res.status, pickErrorMessage(errBody, res.status), errBody);
   }
 

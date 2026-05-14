@@ -1,6 +1,8 @@
-import { mockRanking } from "@/mocks/ranking";
-import { mockRequest } from "./api";
+import type { RankingPlayer } from "@/types";
+import { apiClient } from "@/lib/api";
 
 export const rankingService = {
-  async list() { return mockRequest(mockRanking); },
+  async list(): Promise<RankingPlayer[]> {
+    return apiClient.get<RankingPlayer[]>("/ranking", { auth: false });
+  },
 };

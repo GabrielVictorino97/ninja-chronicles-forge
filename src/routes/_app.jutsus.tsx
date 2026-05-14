@@ -1,13 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SectionTitle } from "@/components/game/SectionTitle";
-import { mockJutsus } from "@/mocks/jutsus";
 import { useGameStore } from "@/store/gameStore";
-import { mockCharacter } from "@/mocks/character";
 import { jutsuService } from "@/services/jutsuService";
-import { Sparkles, BookOpen, Plus, Minus, Lock, Swords } from "lucide-react";
+import type { CharacterJutsuDto } from "@/services/jutsuService";
+import { Sparkles, BookOpen, Plus, Minus, Lock, Swords, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Jutsu } from "@/types";
 
@@ -19,46 +18,81 @@ export const Route = createFileRoute("/_app/jutsus")({
 const MAX_EQUIPPED = 5;
 
 function JutsusPage() {
-  const character = useGameStore((s) => s.character) ?? mockCharacter;
+  const character = useGameStore((s) => s.character);
   const patch = useGameStore((s) => s.patchCharacter);
 
-  const equippedJutsus = mockJutsus.filter((j) => character.equippedJutsus.includes(j.id));
-  const knownNotEquipped = mockJutsus.filter(
-    (j) => character.knownJutsus.includes(j.id) && !character.equippedJutsus.includes(j.id),
+  const [allJutsus, setAllJutsus] = useState<Jutsu[]>([]);
+  const [myJutsus, setMyJutsus] = useState<CharacterJutsuDto[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!character) { setLoading(false); return; }
+    Promise.all([
+      jutsuService.list(),
+      jutsuService.myJutsus(character.id),
+    ]).then(([all, mine]) => {
+      setAllJutsus(all);
+      setMyJutsus(mine);
+    }).finally(() => setLoading(false));
+  }, [character?.id]);
+
+  const learnedIds = new Set(myJutsus.map(j => j.id));
+  const equippedIds = new Set(myJutsus.filter(j => j.equipped).map(j => j.id));
+
+  const equippedJutsus = allJutsus.filter((j) => equippedIds.has(j.id));
+  const knownNotEquipped = allJutsus.filter(
+    (j) => learnedIds.has(j.id) && !equippedIds.has(j.id),
   );
-  const learnable = mockJutsus.filter((j) => !character.knownJutsus.includes(j.id));
+  const learnable = allJutsus.filter((j) => !learnedIds.has(j.id));
 
   async function learn(j: Jutsu) {
-    if (j.requirements.level > character.level) {
-      toast.error(`Você precisa ser nível ${j.requirements.level} para aprender ${j.name}.`);
-      return;
+    if (!character) return;
+    try {
+      await jutsuService.learn(character.id, j.id);
+      const updated = await jutsuService.myJutsus(character.id);
+      setMyJutsus(updated);
+      patch({ knownJutsus: [...character.knownJutsus, j.id] });
+      toast.success(`${j.name} aprendido!`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao aprender jutsu");
     }
-    await jutsuService.learn(j.id);
-    patch({ knownJutsus: [...character.knownJutsus, j.id] });
-    toast.success(`${j.name} aprendido!`);
   }
 
-  async function equip(id: string) {
-    if (character.equippedJutsus.includes(id)) return;
-    if (character.equippedJutsus.length >= MAX_EQUIPPED) {
-      toast.error(`Você já equipou o máximo de ${MAX_EQUIPPED} jutsus. Desequipe um primeiro.`);
+  async function equipJutsu(id: string) {
+    if (!character) return;
+    if (equippedIds.has(id)) return;
+    if (equippedIds.size >= MAX_EQUIPPED) {
+      toast.error(`Você já equipou o máximo de ${MAX_EQUIPPED} jutsus.`);
       return;
     }
-    await jutsuService.equip(id);
-    patch({ equippedJutsus: [...character.equippedJutsus, id] });
-    toast.success("Jutsu equipado!");
+    try {
+      await jutsuService.equip(character.id, id);
+      const updated = await jutsuService.myJutsus(character.id);
+      setMyJutsus(updated);
+      toast.success("Jutsu equipado!");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao equipar");
+    }
   }
 
-  async function unequip(id: string) {
-    if (!character.equippedJutsus.includes(id)) return;
-    if (character.equippedJutsus.length <= 1) {
+  async function unequipJutsu(id: string) {
+    if (!character) return;
+    if (equippedIds.size <= 1) {
       toast.error("Você precisa manter pelo menos 1 jutsu equipado.");
       return;
     }
-    await jutsuService.equip(id);
-    patch({ equippedJutsus: character.equippedJutsus.filter((x) => x !== id) });
-    toast.info("Jutsu desequipado.");
+    try {
+      await jutsuService.unequip(character.id, id);
+      const updated = await jutsuService.myJutsus(character.id);
+      setMyJutsus(updated);
+      toast.info("Jutsu desequipado.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao desequipar");
+    }
   }
+
+  if (!character) return null;
+  if (loading) return <div className="flex justify-center py-20"><Loader2 className="size-8 animate-spin text-muted-foreground" /></div>;
 
   return (
     <div className="space-y-5">
@@ -98,7 +132,7 @@ function JutsusPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => unequip(j.id)}
+                      onClick={() => unequipJutsu(j.id)}
                       disabled={equippedJutsus.length <= 1}
                     >
                       <Minus className="size-3.5" /> Desequipar
@@ -144,7 +178,7 @@ function JutsusPage() {
                       key={j.id}
                       j={j}
                       action={
-                        <Button size="sm" onClick={() => equip(j.id)} disabled={full}>
+                        <Button size="sm" onClick={() => equipJutsu(j.id)} disabled={full}>
                           <Plus className="size-3.5" /> {full ? "Cheio" : "Equipar"}
                         </Button>
                       }

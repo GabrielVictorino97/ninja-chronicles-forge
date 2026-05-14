@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Character, User } from "@/types";
 import { mockCharacter, mockUser } from "@/mocks/character";
-import { tokenStorage } from "@/lib/api";
+import { tokenStorage, ApiError } from "@/lib/api";
 import { authService } from "@/services/authService";
 import { characterService } from "@/services/characterService";
 
@@ -79,9 +79,16 @@ export const useGameStore = create<GameState>()(
           } catch {
             set({ character: null, hasCharacter: false });
           }
-        } catch {
-          tokenStorage.clear();
-          set({ isAuthenticated: false, user: null, character: null, hasCharacter: false });
+        } catch (e) {
+          // Só limpa a sessão se for erro de autenticação (401/403).
+          // Erros de rede ou servidor não devem destruir os tokens.
+          if (e instanceof ApiError && (e.status === 401 || e.status === 403)) {
+            tokenStorage.clear();
+            set({ isAuthenticated: false, user: null, character: null, hasCharacter: false });
+          } else {
+            // Mantém isAuthenticated mesmo com erro de rede — tenta de novo depois.
+            set({ isAuthenticated: true });
+          }
         }
       },
       seedDemo: () => set({ isAuthenticated: true, user: mockUser, character: mockCharacter, hasCharacter: true }),

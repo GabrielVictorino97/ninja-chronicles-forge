@@ -7,8 +7,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/store/gameStore";
-import { mockNotifications } from "@/mocks/character";
+import { onSessionExpired } from "@/lib/api";
+import { captureUnhandledErrors } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -39,10 +41,26 @@ export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
 
-  // Reidrata sessão a partir do JWT salvo; redireciona para login se não autenticado.
+  // Captura erros não tratados e envia para o Seq.
+  useEffect(() => { captureUnhandledErrors(); }, []);
+
+  // Quando o refresh token falha, redireciona para login.
   useEffect(() => {
+    onSessionExpired(() => {
+      useGameStore.getState().logout();
+      navigate({ to: "/login" });
+    });
+  }, [navigate]);
+
+  // Reidrata sessão a partir do JWT salvo; redireciona para login se não autenticado.
+  // Só roda no cliente — localStorage não existe durante SSR.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     if (!isAuthenticated) {
-      hydrate().then(() => {
+      hydrate().catch((e) => {
+        toast.error(e instanceof Error ? e.message : "Falha ao conectar ao servidor");
+        navigate({ to: "/login" });
+      }).then(() => {
         if (!useGameStore.getState().isAuthenticated) {
           navigate({ to: "/login" });
         }
@@ -156,7 +174,7 @@ function SidebarContent({ path, onNavigate }: { path: string; onNavigate?: () =>
 
 function Header({ onOpenSidebar, onLogout }: { onOpenSidebar: () => void; onLogout: () => void }) {
   const character = useGameStore((s) => s.character);
-  const unread = mockNotifications.filter((n) => !n.read).length;
+  const unread = 0;
   if (!character) return null;
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/70 backdrop-blur">
@@ -204,12 +222,7 @@ function Header({ onOpenSidebar, onLogout }: { onOpenSidebar: () => void; onLogo
             <DropdownMenuContent align="end" className="w-72">
               <DropdownMenuLabel>Notificações</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {mockNotifications.map((n) => (
-                <DropdownMenuItem key={n.id} className="flex flex-col items-start gap-0.5">
-                  <span className="text-sm font-medium">{n.title}</span>
-                  <span className="text-xs text-muted-foreground">{n.description}</span>
-                </DropdownMenuItem>
-              ))}
+              <DropdownMenuItem className="text-xs text-muted-foreground">Nenhuma notificação.</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 

@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "sonner";
@@ -111,6 +112,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    import("@/mocks/browser")
+      .then((m) => m.worker.start({ onUnhandledRequest: "bypass" }))
+      .catch(() => {});
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
