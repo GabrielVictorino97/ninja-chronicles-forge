@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_app")({
       throw redirect({ to: "/login" });
     }
     if (!state.hasCharacter) {
-      throw redirect({ to: "/create-character" });
+      throw redirect({ to: "/select-character" });
     }
   },
   component: AppLayout,
