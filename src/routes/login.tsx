@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authService } from "@/services/authService";
-import { characterService } from "@/services/characterService";
 import { useGameStore } from "@/store/gameStore";
 import { toast } from "sonner";
 import { Loader2, LogIn } from "lucide-react";
@@ -36,7 +35,6 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const navigate = useNavigate();
   const login = useGameStore((s) => s.login);
-  const setCharacter = useGameStore((s) => s.setCharacter);
   const [demoLoading, setDemoLoading] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
