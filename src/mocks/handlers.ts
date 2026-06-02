@@ -40,7 +40,7 @@ const equippedJutsus: Set<string> = new Set();
 const inventory: Map<string, { itemId: string; quantity: number; equipped: boolean; slot: string | null }> = new Map();
 
 function resetCharacterState() {
-  character = null;
+  character = null as unknown as Character;
   knownJutsus.clear();
   equippedJutsus.clear();
   inventory.clear();
