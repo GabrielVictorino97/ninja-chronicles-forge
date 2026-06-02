@@ -1,11 +1,5 @@
 import { http, HttpResponse, delay } from "msw";
-import type {
-  Character,
-  HuntStatus,
-  ElementOption,
-  AuthResponse,
-  BaseAttributes,
-} from "@/types";
+import type { Character, HuntStatus, ElementOption, AuthResponse, BaseAttributes } from "@/types";
 import { mockVillages } from "./villages";
 import { mockBloodlineClans } from "./clans";
 import { mockJutsus } from "./jutsus";
@@ -37,7 +31,10 @@ const DELAY = 150;
 let character: Character = null as unknown as Character;
 const knownJutsus: Set<string> = new Set();
 const equippedJutsus: Set<string> = new Set();
-const inventory: Map<string, { itemId: string; quantity: number; equipped: boolean; slot: string | null }> = new Map();
+const inventory: Map<
+  string,
+  { itemId: string; quantity: number; equipped: boolean; slot: string | null }
+> = new Map();
 
 function resetCharacterState() {
   character = null as unknown as Character;
@@ -89,7 +86,10 @@ export const handlers = [
     await delay(DELAY);
     const body = (await request.json()) as { email: string; password: string };
     if (!body.email || !body.password) {
-      return HttpResponse.json({ errors: { email: ["Email e senha obrigatórios."] } }, { status: 400 });
+      return HttpResponse.json(
+        { errors: { email: ["Email e senha obrigatórios."] } },
+        { status: 400 },
+      );
     }
     const res: AuthResponse = {
       accessToken: MOCK_JWT,
@@ -103,12 +103,21 @@ export const handlers = [
     await delay(DELAY);
     const body = (await request.json()) as { name: string; email: string; password: string };
     if (!body.name || !body.email || !body.password) {
-      return HttpResponse.json({ errors: { name: ["Todos os campos são obrigatórios."] } }, { status: 400 });
+      return HttpResponse.json(
+        { errors: { name: ["Todos os campos são obrigatórios."] } },
+        { status: 400 },
+      );
     }
     const res: AuthResponse = {
       accessToken: MOCK_JWT,
       refreshToken: MOCK_REFRESH,
-      user: { id: "u1", email: body.email, name: body.name, createdAt: new Date().toISOString(), role: "Player" },
+      user: {
+        id: "u1",
+        email: body.email,
+        name: body.name,
+        createdAt: new Date().toISOString(),
+        role: "Player",
+      },
     };
     return HttpResponse.json(res);
   }),
@@ -124,6 +133,12 @@ export const handlers = [
   }),
 
   // ── Characters ────────────────────────────────────────
+  http.get(`*/api/characters`, async () => {
+    await delay(DELAY);
+    const list = character ? [charToDto(character)] : [];
+    return HttpResponse.json(list);
+  }),
+
   http.get(`*/api/characters/me`, async () => {
     await delay(DELAY);
     if (!character) return HttpResponse.json(null, { status: 204 });
@@ -133,7 +148,8 @@ export const handlers = [
   http.get(`*/api/characters/:id`, async ({ params }) => {
     await delay(DELAY);
     const { id } = params;
-    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    if (!character)
+      return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     if (id === character.id) {
       return HttpResponse.json(charToDto(character));
     }
@@ -147,7 +163,10 @@ export const handlers = [
     const village = mockVillages.find((v) => v.id === body.villageId);
     const clan = mockBloodlineClans.find((c) => c.id === body.clanId);
     if (!village || !clan) {
-      return HttpResponse.json({ errors: { villageId: ["Vila ou clã inválido."] } }, { status: 400 });
+      return HttpResponse.json(
+        { errors: { villageId: ["Vila ou clã inválido."] } },
+        { status: 400 },
+      );
     }
     resetCharacterState();
     character = {
@@ -171,9 +190,14 @@ export const handlers = [
       ryous: 100,
       power: 100,
       attributes: {
-        taijutsu: 5, ninjutsu: 5, genjutsu: 5,
-        intelligence: 5, vitality: 5, chakra: 5,
-        agility: 5, luck: 5,
+        taijutsu: 5,
+        ninjutsu: 5,
+        genjutsu: 5,
+        intelligence: 5,
+        vitality: 5,
+        chakra: 5,
+        agility: 5,
+        luck: 5,
       },
       unspentPoints: 0,
       equippedJutsus: [],
@@ -188,7 +212,8 @@ export const handlers = [
 
   http.put(`*/api/characters/:id/attributes`, async ({ request }) => {
     await delay(DELAY);
-    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    if (!character)
+      return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const body = (await request.json()) as { attributes: Partial<BaseAttributes> };
     if (body.attributes) {
       for (const [k, v] of Object.entries(body.attributes)) {
@@ -265,18 +290,44 @@ export const handlers = [
   http.get(`*/api/elements`, async () => {
     await delay(DELAY);
     const elements: ElementOption[] = [
-      { name: "Katon", description: "Estilo Fogo — ofensivo e destrutivo.", requiredLevel: 10, learned: character.elements.includes("Katon") },
-      { name: "Suiton", description: "Estilo Água — versátil e adaptável.", requiredLevel: 10, learned: character.elements.includes("Suiton") },
-      { name: "Doton", description: "Estilo Terra — defensivo e resistente.", requiredLevel: 12, learned: character.elements.includes("Doton") },
-      { name: "Fuuton", description: "Estilo Vento — cortante e rápido.", requiredLevel: 14, learned: character.elements.includes("Fuuton") },
-      { name: "Raiton", description: "Estilo Raio — veloz e perfurante.", requiredLevel: 16, learned: character.elements.includes("Raiton") },
+      {
+        name: "Katon",
+        description: "Estilo Fogo — ofensivo e destrutivo.",
+        requiredLevel: 10,
+        learned: character.elements.includes("Katon"),
+      },
+      {
+        name: "Suiton",
+        description: "Estilo Água — versátil e adaptável.",
+        requiredLevel: 10,
+        learned: character.elements.includes("Suiton"),
+      },
+      {
+        name: "Doton",
+        description: "Estilo Terra — defensivo e resistente.",
+        requiredLevel: 12,
+        learned: character.elements.includes("Doton"),
+      },
+      {
+        name: "Fuuton",
+        description: "Estilo Vento — cortante e rápido.",
+        requiredLevel: 14,
+        learned: character.elements.includes("Fuuton"),
+      },
+      {
+        name: "Raiton",
+        description: "Estilo Raio — veloz e perfurante.",
+        requiredLevel: 16,
+        learned: character.elements.includes("Raiton"),
+      },
     ];
     return HttpResponse.json(elements);
   }),
 
   http.post(`*/api/characters/:id/elements/:element/learn`, async ({ params }) => {
     await delay(DELAY);
-    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    if (!character)
+      return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const el = params.element as string;
     if (!character.elements.includes(el as Character["elements"][number])) {
       character.elements = [...character.elements, el as Character["elements"][number]];
@@ -290,8 +341,8 @@ export const handlers = [
     return HttpResponse.json(
       mockMissions.map((m) => ({
         ...m,
-        durationMinutes: (["D","C","B","A","S"].indexOf(m.rank) + 1) * 3 + 2,
-      }))
+        durationMinutes: (["D", "C", "B", "A", "S"].indexOf(m.rank) + 1) * 3 + 2,
+      })),
     );
   }),
 
@@ -302,12 +353,19 @@ export const handlers = [
 
   http.post(`*/api/characters/:id/missions/:missionId/complete`, async ({ params }) => {
     await delay(DELAY);
-    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    if (!character)
+      return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const mission = mockMissions.find((m) => m.id === params.missionId);
     if (!mission) return HttpResponse.json({ detail: "Missão não encontrada." }, { status: 404 });
     character.ryous += mission.ryousReward;
     const level = applyXp(mission.xpReward);
-    return HttpResponse.json({ xp: mission.xpReward, ryous: mission.ryousReward, drops: mission.drops, leveledUp: level.leveledUp, newLevel: level.newLevel });
+    return HttpResponse.json({
+      xp: mission.xpReward,
+      ryous: mission.ryousReward,
+      drops: mission.drops,
+      leveledUp: level.leveledUp,
+      newLevel: level.newLevel,
+    });
   }),
 
   // ── Inventory ─────────────────────────────────────────
@@ -324,7 +382,15 @@ export const handlers = [
         quantity: inv.quantity,
         equipped: inv.equipped,
         slot: inv.slot,
-        bonuses: { attack: 0, defense: 0, intelligence: 0, agility: 0, vitality: 0, chakra: 0, luck: 0 },
+        bonuses: {
+          attack: 0,
+          defense: 0,
+          intelligence: 0,
+          agility: 0,
+          vitality: 0,
+          chakra: 0,
+          luck: 0,
+        },
       };
     });
     return HttpResponse.json(result);
@@ -350,14 +416,23 @@ export const handlers = [
     return HttpResponse.json(
       mockItems.map((i) => ({
         ...i,
-        bonuses: { attack: 0, defense: 0, intelligence: 0, agility: 0, vitality: 0, chakra: 0, luck: 0 },
-      }))
+        bonuses: {
+          attack: 0,
+          defense: 0,
+          intelligence: 0,
+          agility: 0,
+          vitality: 0,
+          chakra: 0,
+          luck: 0,
+        },
+      })),
     );
   }),
 
   http.post(`*/api/characters/:id/shop/buy/:itemId`, async ({ params }) => {
     await delay(DELAY);
-    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    if (!character)
+      return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const item = mockItems.find((it) => it.id === params.itemId);
     if (!item) return HttpResponse.json({ detail: "Item não encontrado." }, { status: 404 });
     if (character.ryous < item.price) {
@@ -415,7 +490,8 @@ export const handlers = [
   // ── Hunts ─────────────────────────────────────────────
   http.get(`*/api/characters/:id/hunts/status`, async () => {
     await delay(DELAY);
-    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    if (!character)
+      return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const status: HuntStatus = {
       active: false,
       huntLevel: 0,
@@ -435,24 +511,33 @@ export const handlers = [
 
   http.post(`*/api/characters/:id/hunts/start`, async () => {
     await delay(DELAY);
-    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    if (!character)
+      return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     return HttpResponse.json(null, { status: 204 });
   }),
 
   http.post(`*/api/characters/:id/hunts/complete`, async () => {
     await delay(DELAY);
-    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    if (!character)
+      return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const xp = 150;
     const ryous = 200;
     character.ryous += ryous;
     const level = applyXp(xp);
-    return HttpResponse.json({ xp, ryous, durationMinutes: 30, leveledUp: level.leveledUp, newLevel: level.newLevel });
+    return HttpResponse.json({
+      xp,
+      ryous,
+      durationMinutes: 30,
+      leveledUp: level.leveledUp,
+      newLevel: level.newLevel,
+    });
   }),
 
   // ── Battles ───────────────────────────────────────────
   http.post(`*/api/characters/:id/battles/npc`, async () => {
     await delay(DELAY);
-    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    if (!character)
+      return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const xp = 150;
     const ryous = 120;
     character.ryous += ryous;
@@ -476,7 +561,8 @@ export const handlers = [
 
   http.post(`*/api/characters/:id/battles/pvp`, async () => {
     await delay(DELAY);
-    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    if (!character)
+      return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const xp = 200;
     const ryous = 180;
     character.ryous += ryous;
@@ -516,7 +602,7 @@ export const handlers = [
         createdAt: u.createdAt,
         lastLogin: u.lastLogin,
         ip: u.ip,
-      }))
+      })),
     );
   }),
 
