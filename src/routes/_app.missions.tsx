@@ -48,8 +48,8 @@ function MissionsPage() {
       const updated = await characterService.get();
       setCharacter(updated);
       toast.success(`Missão concluída! +${r.xp} XP, +${r.ryous} ryous`);
-      if (r.leveledUp || updated.level > prevLevel) {
-        toast.success(`Subiu de nível! Agora você é nível ${updated.level}.`);
+      if (r.leveledUp || (updated?.level ?? 0) > prevLevel) {
+        toast.success(`Subiu de nível! Agora você é nível ${updated?.level}.`);
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao concluir missão");
