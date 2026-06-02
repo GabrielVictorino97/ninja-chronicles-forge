@@ -56,7 +56,7 @@ export const Route = createFileRoute("/_app/character")({
 
 function CharacterPage() {
   const stored = useGameStore((s) => s.character);
-  const patch = useGameStore((s) => s.patchCharacter);
+  const setCharacter = useGameStore((s) => s.setCharacter);
   const [villages, setVillages] = useState<Village[]>([]);
   const [clans, setClans] = useState<BloodlineClan[]>([]);
   const [draft, setDraft] = useState<BaseAttributes | null>(null);
@@ -90,10 +90,17 @@ function CharacterPage() {
 
   async function save() {
     if (!stored || !draft) return;
+    // Envia apenas o delta (pontos adicionados), não os valores absolutos.
+    const delta: Partial<BaseAttributes> = {};
+    (Object.keys(draft) as (keyof BaseAttributes)[]).forEach((k) => {
+      const d = draft[k] - stored.attributes[k];
+      if (d > 0) delta[k] = d;
+    });
+    if (Object.keys(delta).length === 0) return;
     setSaving(true);
     try {
-      const updated = await characterService.distributePoints(stored.id, draft);
-      patch({ attributes: draft, unspentPoints: updated.unspentPoints ?? remaining });
+      const updated = await characterService.distributePoints(stored.id, delta);
+      setCharacter(updated);
       toast.success("Atributos salvos!");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar atributos");

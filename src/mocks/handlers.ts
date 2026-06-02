@@ -216,11 +216,19 @@ export const handlers = [
       return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const body = (await request.json()) as { attributes: Partial<BaseAttributes> };
     if (body.attributes) {
+      const total = Object.values(body.attributes).reduce((s, v) => s + v, 0);
+      if (total > character.unspentPoints) {
+        return HttpResponse.json(
+          { detail: "Pontos insuficientes." },
+          { status: 400 },
+        );
+      }
       for (const [k, v] of Object.entries(body.attributes)) {
         const key = k as keyof BaseAttributes;
         character.attributes[key] += v as number;
         character.power += (v as number) * 120;
       }
+      character.unspentPoints -= total;
     }
     return HttpResponse.json(charToDto(character));
   }),
