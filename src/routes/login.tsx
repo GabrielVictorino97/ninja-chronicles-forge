@@ -26,7 +26,7 @@ export const Route = createFileRoute("/login")({
       throw redirect({ to: "/dashboard" });
     }
     if (state.isAuthenticated && !state.hasCharacter) {
-      throw redirect({ to: "/create-character" });
+      throw redirect({ to: "/select-character" });
     }
   },
   component: LoginPage,
@@ -46,13 +46,9 @@ function LoginPage() {
   async function doLogin(email: string, password: string) {
     const res = await authService.login(email, password);
     login(res.user);
-    const character = await characterService.get();
-    if (character) {
-      setCharacter(character);
-      navigate({ to: "/dashboard" });
-    } else {
-      navigate({ to: "/create-character" });
-    }
+    // Sempre vai para a sele\u00e7\u00e3o de personagens — a tela busca a lista
+    // e oferece a op\u00e7\u00e3o de criar um novo se a conta n\u00e3o tiver nenhum.
+    navigate({ to: "/select-character" });
   }
 
   async function onSubmit(values: FormData) {

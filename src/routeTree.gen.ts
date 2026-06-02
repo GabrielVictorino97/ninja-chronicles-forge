@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SelectCharacterRouteImport } from './routes/select-character'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CreateCharacterRouteImport } from './routes/create-character'
@@ -36,6 +37,11 @@ import { Route as AppClanRouteImport } from './routes/_app.clan'
 import { Route as AppCharacterRouteImport } from './routes/_app.character'
 import { Route as AppBattleRouteImport } from './routes/_app.battle'
 
+const SelectCharacterRoute = SelectCharacterRouteImport.update({
+  id: '/select-character',
+  path: '/select-character',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -172,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/select-character': typeof SelectCharacterRoute
   '/battle': typeof AppBattleRoute
   '/character': typeof AppCharacterRoute
   '/clan': typeof AppClanRoute
@@ -198,6 +205,7 @@ export interface FileRoutesByTo {
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/select-character': typeof SelectCharacterRoute
   '/battle': typeof AppBattleRoute
   '/character': typeof AppCharacterRoute
   '/clan': typeof AppClanRoute
@@ -227,6 +235,7 @@ export interface FileRoutesById {
   '/create-character': typeof CreateCharacterRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/select-character': typeof SelectCharacterRoute
   '/_app/battle': typeof AppBattleRoute
   '/_app/character': typeof AppCharacterRoute
   '/_app/clan': typeof AppClanRoute
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
     | '/create-character'
     | '/login'
     | '/register'
+    | '/select-character'
     | '/battle'
     | '/character'
     | '/clan'
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/create-character'
     | '/login'
     | '/register'
+    | '/select-character'
     | '/battle'
     | '/character'
     | '/clan'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '/create-character'
     | '/login'
     | '/register'
+    | '/select-character'
     | '/_app/battle'
     | '/_app/character'
     | '/_app/clan'
@@ -339,10 +351,18 @@ export interface RootRouteChildren {
   CreateCharacterRoute: typeof CreateCharacterRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  SelectCharacterRoute: typeof SelectCharacterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/select-character': {
+      id: '/select-character'
+      path: '/select-character'
+      fullPath: '/select-character'
+      preLoaderRoute: typeof SelectCharacterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -591,6 +611,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreateCharacterRoute: CreateCharacterRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  SelectCharacterRoute: SelectCharacterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
