@@ -40,8 +40,8 @@ function BattlePage() {
       setCharacter(updated);
       if (r.result === "Vitoria") {
         toast.success(`Vitória contra ${r.enemyName}! +${r.xpReward} XP, +${r.ryousReward} ryous`);
-        if (r.leveledUp || updated.level > prevLevel) {
-          toast.success(`Subiu de nível! Agora você é nível ${updated.level}.`);
+        if (r.leveledUp || (updated?.level ?? 0) > prevLevel) {
+          toast.success(`Subiu de nível! Agora você é nível ${updated?.level}.`);
         }
       } else {
         toast.error(`Derrota para ${r.enemyName}. ${r.ryousReward} ryous`);
