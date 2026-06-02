@@ -46,15 +46,15 @@ export const useGameStore = create<GameState>()(
         try {
           const user = await authService.me();
           set({ isAuthenticated: true, user });
-          try {
-            const c = await characterService.get();
-            if (c) {
-              set({ character: c, hasCharacter: true });
-            } else {
+          // Refresca o personagem selecionado, se houver um persistido.
+          const current = get().character;
+          if (current?.id) {
+            try {
+              const fresh = await characterService.getById(current.id);
+              set({ character: fresh, hasCharacter: true });
+            } catch {
               set({ character: null, hasCharacter: false });
             }
-          } catch {
-            set({ character: null, hasCharacter: false });
           }
         } catch (e) {
           // Só limpa a sessão se for erro de autenticação (401/403).
