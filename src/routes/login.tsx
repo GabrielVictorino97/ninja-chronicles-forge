@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authService } from "@/services/authService";
-import { characterService } from "@/services/characterService";
 import { useGameStore } from "@/store/gameStore";
 import { toast } from "sonner";
 import { Loader2, LogIn } from "lucide-react";
@@ -26,7 +25,7 @@ export const Route = createFileRoute("/login")({
       throw redirect({ to: "/dashboard" });
     }
     if (state.isAuthenticated && !state.hasCharacter) {
-      throw redirect({ to: "/create-character" });
+      throw redirect({ to: "/select-character" });
     }
   },
   component: LoginPage,
@@ -36,7 +35,6 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const navigate = useNavigate();
   const login = useGameStore((s) => s.login);
-  const setCharacter = useGameStore((s) => s.setCharacter);
   const [demoLoading, setDemoLoading] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -46,13 +44,9 @@ function LoginPage() {
   async function doLogin(email: string, password: string) {
     const res = await authService.login(email, password);
     login(res.user);
-    const character = await characterService.get();
-    if (character) {
-      setCharacter(character);
-      navigate({ to: "/dashboard" });
-    } else {
-      navigate({ to: "/create-character" });
-    }
+    // Sempre vai para a sele\u00e7\u00e3o de personagens — a tela busca a lista
+    // e oferece a op\u00e7\u00e3o de criar um novo se a conta n\u00e3o tiver nenhum.
+    navigate({ to: "/select-character" });
   }
 
   async function onSubmit(values: FormData) {

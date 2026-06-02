@@ -34,13 +34,13 @@ import {
 const DELAY = 150;
 
 // Mutable in-memory state that survives across requests within a session
-let character: Character | null = null;
+let character: Character = null as unknown as Character;
 const knownJutsus: Set<string> = new Set();
 const equippedJutsus: Set<string> = new Set();
 const inventory: Map<string, { itemId: string; quantity: number; equipped: boolean; slot: string | null }> = new Map();
 
 function resetCharacterState() {
-  character = null;
+  character = null as unknown as Character;
   knownJutsus.clear();
   equippedJutsus.clear();
   inventory.clear();

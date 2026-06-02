@@ -8,12 +8,15 @@ import { characterService } from "@/services/characterService";
 interface GameState {
   isAuthenticated: boolean;
   user: User | null;
+  characters: Character[];
   character: Character | null;
   hasCharacter: boolean;
   login: (user: User) => void;
   logout: () => void;
+  setCharacters: (list: Character[]) => void;
   setCharacter: (c: Character | null) => void;
   patchCharacter: (p: Partial<Character>) => void;
+  clearSelectedCharacter: () => void;
   hydrate: () => Promise<void>;
 }
 
@@ -22,14 +25,17 @@ export const useGameStore = create<GameState>()(
     (set, get) => ({
       isAuthenticated: false,
       user: null,
+      characters: [],
       character: null,
       hasCharacter: false,
       login: (user) => set({ isAuthenticated: true, user }),
       logout: () => {
         void authService.logout();
-        set({ isAuthenticated: false, user: null, character: null, hasCharacter: false });
+        set({ isAuthenticated: false, user: null, character: null, hasCharacter: false, characters: [] });
       },
+      setCharacters: (list) => set({ characters: list }),
       setCharacter: (c) => set({ character: c, hasCharacter: !!c }),
+      clearSelectedCharacter: () => set({ character: null, hasCharacter: false }),
       patchCharacter: (p) => {
         const cur = get().character;
         if (!cur) return;
@@ -40,15 +46,15 @@ export const useGameStore = create<GameState>()(
         try {
           const user = await authService.me();
           set({ isAuthenticated: true, user });
-          try {
-            const c = await characterService.get();
-            if (c) {
-              set({ character: c, hasCharacter: true });
-            } else {
+          // Refresca o personagem selecionado, se houver um persistido.
+          const current = get().character;
+          if (current?.id) {
+            try {
+              const fresh = await characterService.getById(current.id);
+              set({ character: fresh, hasCharacter: true });
+            } catch {
               set({ character: null, hasCharacter: false });
             }
-          } catch {
-            set({ character: null, hasCharacter: false });
           }
         } catch (e) {
           // Só limpa a sessão se for erro de autenticação (401/403).

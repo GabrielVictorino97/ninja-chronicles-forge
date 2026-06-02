@@ -73,8 +73,8 @@ function HuntPage() {
       const updated = await characterService.get();
       setCharacter(updated);
       toast.success(`Caçada concluída! +${r.xp} XP, +${r.ryous} ryous`);
-      if (r.leveledUp || updated.level > character.level) {
-        toast.success(`Subiu de nível! Agora você é nível ${updated.level}.`);
+      if (r.leveledUp || (updated?.level ?? 0) > character.level) {
+        toast.success(`Subiu de nível! Agora você é nível ${updated?.level}.`);
       }
       await refresh();
     } catch (e) {

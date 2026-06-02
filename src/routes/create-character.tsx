@@ -27,9 +27,6 @@ export const Route = createFileRoute("/create-character")({
     if (!state.isAuthenticated) {
       throw redirect({ to: "/login" });
     }
-    if (state.hasCharacter) {
-      throw redirect({ to: "/dashboard" });
-    }
   },
   component: CreateCharacterPage,
 });

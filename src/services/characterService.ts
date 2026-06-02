@@ -12,6 +12,9 @@ export const characterService = {
   get(): Promise<Character | null> {
     return apiClient.get<Character | null>("/characters/me");
   },
+  list(): Promise<Character[]> {
+    return apiClient.get<Character[]>("/characters");
+  },
   getById(id: string): Promise<Character> {
     return apiClient.get<Character>(`/characters/${id}`);
   },
