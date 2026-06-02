@@ -70,9 +70,12 @@ function HuntPage() {
     setBusy(true);
     try {
       const r = await huntService.complete(character.id);
-      toast.success(`Caçada concluída! +${r.xp} XP, +${r.ryous} ryous`);
       const updated = await characterService.get();
       setCharacter(updated);
+      toast.success(`Caçada concluída! +${r.xp} XP, +${r.ryous} ryous`);
+      if (r.leveledUp || updated.level > character.level) {
+        toast.success(`Subiu de nível! Agora você é nível ${updated.level}.`);
+      }
       await refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao concluir caçada");

@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Character, User } from "@/types";
-import { mockCharacter, mockUser } from "@/mocks/character";
 import { tokenStorage, ApiError } from "@/lib/api";
 import { authService } from "@/services/authService";
 import { characterService } from "@/services/characterService";
@@ -13,14 +12,9 @@ interface GameState {
   hasCharacter: boolean;
   login: (user: User) => void;
   logout: () => void;
-  setCharacter: (c: Character) => void;
+  setCharacter: (c: Character | null) => void;
   patchCharacter: (p: Partial<Character>) => void;
-  gainXp: (amount: number) => { leveledUp: boolean; newLevel: number; gained: number };
-  gainRyous: (amount: number) => void;
-  /** Reidrata sessão a partir do JWT salvo no localStorage. */
   hydrate: () => Promise<void>;
-  // Dev seed for prototype usage
-  seedDemo: () => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -35,38 +29,11 @@ export const useGameStore = create<GameState>()(
         void authService.logout();
         set({ isAuthenticated: false, user: null, character: null, hasCharacter: false });
       },
-      setCharacter: (c) => set({ character: c, hasCharacter: true }),
+      setCharacter: (c) => set({ character: c, hasCharacter: !!c }),
       patchCharacter: (p) => {
         const cur = get().character;
         if (!cur) return;
         set({ character: { ...cur, ...p } });
-      },
-      gainXp: (amount) => {
-        const cur = get().character;
-        if (!cur || amount <= 0) return { leveledUp: false, newLevel: cur?.level ?? 1, gained: 0 };
-        let { level, xp, xpToNext, hpMax, chakraMax, hp, chakra, unspentPoints, power } = cur;
-        xp += amount;
-        let leveledUp = false;
-        while (xp >= xpToNext) {
-          xp -= xpToNext;
-          level += 1;
-          leveledUp = true;
-          // Simple growth curve — backend C# será autoritativo no futuro.
-          xpToNext = Math.round(xpToNext * 1.25);
-          hpMax += 40;
-          chakraMax += 30;
-          hp = hpMax;
-          chakra = chakraMax;
-          unspentPoints += 5;
-          power += 350;
-        }
-        set({ character: { ...cur, level, xp, xpToNext, hpMax, chakraMax, hp, chakra, unspentPoints, power } });
-        return { leveledUp, newLevel: level, gained: amount };
-      },
-      gainRyous: (amount) => {
-        const cur = get().character;
-        if (!cur || amount === 0) return;
-        set({ character: { ...cur, ryous: Math.max(0, cur.ryous + amount) } });
       },
       hydrate: async () => {
         if (!tokenStorage.access) return;
@@ -74,8 +41,12 @@ export const useGameStore = create<GameState>()(
           const user = await authService.me();
           set({ isAuthenticated: true, user });
           try {
-            const character = await characterService.get();
-            set({ character, hasCharacter: true });
+            const c = await characterService.get();
+            if (c) {
+              set({ character: c, hasCharacter: true });
+            } else {
+              set({ character: null, hasCharacter: false });
+            }
           } catch {
             set({ character: null, hasCharacter: false });
           }
@@ -91,7 +62,6 @@ export const useGameStore = create<GameState>()(
           }
         }
       },
-      seedDemo: () => set({ isAuthenticated: true, user: mockUser, character: mockCharacter, hasCharacter: true }),
     }),
     { name: "naruto-players-fan-game" },
   ),

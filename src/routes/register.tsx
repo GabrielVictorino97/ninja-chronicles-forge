@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -20,6 +20,15 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export const Route = createFileRoute("/register")({
+  beforeLoad: async () => {
+    const state = useGameStore.getState();
+    if (state.isAuthenticated && state.hasCharacter) {
+      throw redirect({ to: "/dashboard" });
+    }
+    if (state.isAuthenticated && !state.hasCharacter) {
+      throw redirect({ to: "/create-character" });
+    }
+  },
   component: RegisterPage,
   head: () => ({ meta: [{ title: "Criar conta — Naruto Players Fan Game" }] }),
 });

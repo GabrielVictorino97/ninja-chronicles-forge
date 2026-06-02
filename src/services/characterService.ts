@@ -9,8 +9,8 @@ interface CreateCharacterInput {
 }
 
 export const characterService = {
-  get(): Promise<Character> {
-    return apiClient.get<Character>("/characters/me");
+  get(): Promise<Character | null> {
+    return apiClient.get<Character | null>("/characters/me");
   },
   getById(id: string): Promise<Character> {
     return apiClient.get<Character>(`/characters/${id}`);

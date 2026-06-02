@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -22,6 +22,15 @@ const STARTING_POOL = 20;
 const STARTING_BASE = 5;
 
 export const Route = createFileRoute("/create-character")({
+  beforeLoad: async () => {
+    const state = useGameStore.getState();
+    if (!state.isAuthenticated) {
+      throw redirect({ to: "/login" });
+    }
+    if (state.hasCharacter) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: CreateCharacterPage,
 });
 

@@ -1,4 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authService } from "@/services/authService";
+import { characterService } from "@/services/characterService";
 import { useGameStore } from "@/store/gameStore";
 import { toast } from "sonner";
 import { Loader2, LogIn } from "lucide-react";
@@ -18,6 +20,15 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export const Route = createFileRoute("/login")({
+  beforeLoad: async () => {
+    const state = useGameStore.getState();
+    if (state.isAuthenticated && state.hasCharacter) {
+      throw redirect({ to: "/dashboard" });
+    }
+    if (state.isAuthenticated && !state.hasCharacter) {
+      throw redirect({ to: "/create-character" });
+    }
+  },
   component: LoginPage,
   head: () => ({ meta: [{ title: "Entrar — Naruto Players Fan Game" }] }),
 });
@@ -25,18 +36,29 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const navigate = useNavigate();
   const login = useGameStore((s) => s.login);
-  const seed = useGameStore((s) => s.seedDemo);
+  const setCharacter = useGameStore((s) => s.setCharacter);
+  const [demoLoading, setDemoLoading] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { email: "shinobi@vila.gg", password: "123456" },
   });
 
+  async function doLogin(email: string, password: string) {
+    const res = await authService.login(email, password);
+    login(res.user);
+    const character = await characterService.get();
+    if (character) {
+      setCharacter(character);
+      navigate({ to: "/dashboard" });
+    } else {
+      navigate({ to: "/create-character" });
+    }
+  }
+
   async function onSubmit(values: FormData) {
     try {
-      const res = await authService.login(values.email, values.password);
-      login(res.user);
+      await doLogin(values.email, values.password);
       toast.success("Bem-vindo de volta, shinobi!");
-      navigate({ to: "/dashboard" });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha no login");
     }
@@ -59,7 +81,24 @@ function LoginPage() {
           {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : <LogIn className="size-4" />}
           Entrar
         </Button>
-        <Button type="button" variant="ghost" className="w-full" onClick={() => { seed(); navigate({ to: "/dashboard" }); }}>
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full"
+          disabled={demoLoading}
+          onClick={async () => {
+            setDemoLoading(true);
+            try {
+              await doLogin("shinobi@vila.gg", "123456");
+              toast.success("Bem-vindo, shinobi!");
+            } catch (e) {
+              toast.error(e instanceof Error ? e.message : "Falha ao entrar como demo");
+            } finally {
+              setDemoLoading(false);
+            }
+          }}
+        >
+          {demoLoading ? <Loader2 className="size-4 animate-spin" /> : null}
           Entrar como demo
         </Button>
         <p className="text-center text-sm text-muted-foreground">

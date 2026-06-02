@@ -31,29 +31,49 @@ import {
   mockBalanceSettings,
 } from "./admin";
 
-const BASE = "http://localhost:5271/api";
 const DELAY = 150;
 
 // Mutable in-memory state that survives across requests within a session
-let character: Character = structuredClone(mockCharacter);
-const knownJutsus: Set<string> = new Set(character.knownJutsus);
-const equippedJutsus: Set<string> = new Set(character.equippedJutsus);
-const inventory: Map<string, { itemId: string; quantity: number; equipped: boolean; slot: string | null }> = new Map(
-  mockInventory.map((i) => [i.itemId, { itemId: i.itemId, quantity: i.quantity, equipped: i.equipped ?? false, slot: i.slot ?? null }])
-);
+let character: Character | null = null;
+const knownJutsus: Set<string> = new Set();
+const equippedJutsus: Set<string> = new Set();
+const inventory: Map<string, { itemId: string; quantity: number; equipped: boolean; slot: string | null }> = new Map();
 
 function resetCharacterState() {
-  character = structuredClone(mockCharacter);
+  character = null;
   knownJutsus.clear();
-  character.knownJutsus.forEach((id) => knownJutsus.add(id));
   equippedJutsus.clear();
-  character.equippedJutsus.forEach((id) => equippedJutsus.add(id));
   inventory.clear();
-  mockInventory.forEach((i) => inventory.set(i.itemId, { itemId: i.itemId, quantity: i.quantity, equipped: i.equipped ?? false, slot: i.slot ?? null }));
 }
 
-function charToDto(c: Character) {
+function charToDto(c: Character | null) {
+  if (!c) return null;
   return { ...c };
+}
+
+function requireCharacter() {
+  if (!character) throw new Error("No character");
+  return character;
+}
+
+function applyXp(amount: number): { leveledUp: boolean; newLevel: number } {
+  const c = requireCharacter();
+  if (amount <= 0) return { leveledUp: false, newLevel: c.level };
+  c.xp += amount;
+  let leveledUp = false;
+  while (c.xp >= c.xpToNext) {
+    c.xp -= c.xpToNext;
+    c.level += 1;
+    leveledUp = true;
+    c.xpToNext = Math.round(c.xpToNext * 1.25);
+    c.hpMax += 40;
+    c.chakraMax += 30;
+    c.hp = c.hpMax;
+    c.chakra = c.chakraMax;
+    c.unspentPoints += 5;
+    c.power += 350;
+  }
+  return { leveledUp, newLevel: c.level };
 }
 
 function jwtPayload() {
@@ -65,7 +85,7 @@ const MOCK_REFRESH = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock-refresh";
 
 export const handlers = [
   // ── Auth ──────────────────────────────────────────────
-  http.post(`${BASE}/auth/login`, async ({ request }) => {
+  http.post(`*/api/auth/login`, async ({ request }) => {
     await delay(DELAY);
     const body = (await request.json()) as { email: string; password: string };
     if (!body.email || !body.password) {
@@ -79,7 +99,7 @@ export const handlers = [
     return HttpResponse.json(res);
   }),
 
-  http.post(`${BASE}/auth/register`, async ({ request }) => {
+  http.post(`*/api/auth/register`, async ({ request }) => {
     await delay(DELAY);
     const body = (await request.json()) as { name: string; email: string; password: string };
     if (!body.name || !body.email || !body.password) {
@@ -93,36 +113,34 @@ export const handlers = [
     return HttpResponse.json(res);
   }),
 
-  http.post(`${BASE}/auth/refresh`, async () => {
+  http.post(`*/api/auth/refresh`, async () => {
     await delay(DELAY);
     return HttpResponse.json({ accessToken: MOCK_JWT, refreshToken: MOCK_REFRESH });
   }),
 
-  http.get(`${BASE}/me`, async () => {
+  http.get(`*/api/me`, async () => {
     await delay(DELAY);
     return HttpResponse.json({ ...mockUser, role: "Player" });
   }),
 
   // ── Characters ────────────────────────────────────────
-  http.get(`${BASE}/characters/me`, async () => {
+  http.get(`*/api/characters/me`, async () => {
     await delay(DELAY);
-    const hasCharacter = character.name !== mockCharacter.name || character.id !== mockCharacter.id;
-    if (hasCharacter || character.id === mockCharacter.id) {
-      return HttpResponse.json(charToDto(character));
-    }
-    return HttpResponse.json(null, { status: 204 });
+    if (!character) return HttpResponse.json(null, { status: 204 });
+    return HttpResponse.json(charToDto(character));
   }),
 
-  http.get(`${BASE}/characters/:id`, async ({ params }) => {
+  http.get(`*/api/characters/:id`, async ({ params }) => {
     await delay(DELAY);
     const { id } = params;
-    if (id === character.id || id === "c1") {
+    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    if (id === character.id) {
       return HttpResponse.json(charToDto(character));
     }
     return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
   }),
 
-  http.post(`${BASE}/characters`, async ({ request }) => {
+  http.post(`*/api/characters`, async ({ request }) => {
     await delay(DELAY);
     type CreateInput = { name: string; avatar: string; villageId: string; clanId: string };
     const body = (await request.json()) as CreateInput;
@@ -168,8 +186,9 @@ export const handlers = [
     return HttpResponse.json(charToDto(character), { status: 201 });
   }),
 
-  http.put(`${BASE}/characters/:id/attributes`, async ({ request }) => {
+  http.put(`*/api/characters/:id/attributes`, async ({ request }) => {
     await delay(DELAY);
+    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const body = (await request.json()) as { attributes: Partial<BaseAttributes> };
     if (body.attributes) {
       for (const [k, v] of Object.entries(body.attributes)) {
@@ -182,23 +201,23 @@ export const handlers = [
   }),
 
   // ── Villages & Clans ──────────────────────────────────
-  http.get(`${BASE}/villages`, async () => {
+  http.get(`*/api/villages`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockVillages);
   }),
 
-  http.get(`${BASE}/bloodline-clans`, async () => {
+  http.get(`*/api/bloodline-clans`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockBloodlineClans);
   }),
 
   // ── Jutsus ────────────────────────────────────────────
-  http.get(`${BASE}/jutsus`, async () => {
+  http.get(`*/api/jutsus`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockJutsus);
   }),
 
-  http.get(`${BASE}/characters/:id/jutsus`, async () => {
+  http.get(`*/api/characters/:id/jutsus`, async () => {
     await delay(DELAY);
     const jutsus = mockJutsus
       .filter((j) => knownJutsus.has(j.id))
@@ -217,14 +236,14 @@ export const handlers = [
     return HttpResponse.json(jutsus);
   }),
 
-  http.post(`${BASE}/characters/:id/jutsus/:jutsuId/learn`, async ({ params }) => {
+  http.post(`*/api/characters/:id/jutsus/:jutsuId/learn`, async ({ params }) => {
     await delay(DELAY);
     knownJutsus.add(params.jutsuId as string);
     character.knownJutsus = [...knownJutsus];
     return HttpResponse.json(null, { status: 204 });
   }),
 
-  http.post(`${BASE}/characters/:id/jutsus/:jutsuId/equip`, async ({ params }) => {
+  http.post(`*/api/characters/:id/jutsus/:jutsuId/equip`, async ({ params }) => {
     await delay(DELAY);
     const jId = params.jutsuId as string;
     if (!knownJutsus.has(jId)) {
@@ -235,7 +254,7 @@ export const handlers = [
     return HttpResponse.json(null, { status: 204 });
   }),
 
-  http.post(`${BASE}/characters/:id/jutsus/:jutsuId/unequip`, async ({ params }) => {
+  http.post(`*/api/characters/:id/jutsus/:jutsuId/unequip`, async ({ params }) => {
     await delay(DELAY);
     equippedJutsus.delete(params.jutsuId as string);
     character.equippedJutsus = [...equippedJutsus];
@@ -243,7 +262,7 @@ export const handlers = [
   }),
 
   // ── Elements ──────────────────────────────────────────
-  http.get(`${BASE}/elements`, async () => {
+  http.get(`*/api/elements`, async () => {
     await delay(DELAY);
     const elements: ElementOption[] = [
       { name: "Katon", description: "Estilo Fogo — ofensivo e destrutivo.", requiredLevel: 10, learned: character.elements.includes("Katon") },
@@ -255,8 +274,9 @@ export const handlers = [
     return HttpResponse.json(elements);
   }),
 
-  http.post(`${BASE}/characters/:id/elements/:element/learn`, async ({ params }) => {
+  http.post(`*/api/characters/:id/elements/:element/learn`, async ({ params }) => {
     await delay(DELAY);
+    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const el = params.element as string;
     if (!character.elements.includes(el as Character["elements"][number])) {
       character.elements = [...character.elements, el as Character["elements"][number]];
@@ -265,7 +285,7 @@ export const handlers = [
   }),
 
   // ── Missions ──────────────────────────────────────────
-  http.get(`${BASE}/missions`, async () => {
+  http.get(`*/api/missions`, async () => {
     await delay(DELAY);
     return HttpResponse.json(
       mockMissions.map((m) => ({
@@ -275,22 +295,23 @@ export const handlers = [
     );
   }),
 
-  http.post(`${BASE}/characters/:id/missions/:missionId/start`, async () => {
+  http.post(`*/api/characters/:id/missions/:missionId/start`, async () => {
     await delay(DELAY);
     return HttpResponse.json(null, { status: 204 });
   }),
 
-  http.post(`${BASE}/characters/:id/missions/:missionId/complete`, async ({ params }) => {
+  http.post(`*/api/characters/:id/missions/:missionId/complete`, async ({ params }) => {
     await delay(DELAY);
+    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const mission = mockMissions.find((m) => m.id === params.missionId);
     if (!mission) return HttpResponse.json({ detail: "Missão não encontrada." }, { status: 404 });
-    character.xp += mission.xpReward;
     character.ryous += mission.ryousReward;
-    return HttpResponse.json({ xp: mission.xpReward, ryous: mission.ryousReward, drops: mission.drops });
+    const level = applyXp(mission.xpReward);
+    return HttpResponse.json({ xp: mission.xpReward, ryous: mission.ryousReward, drops: mission.drops, leveledUp: level.leveledUp, newLevel: level.newLevel });
   }),
 
   // ── Inventory ─────────────────────────────────────────
-  http.get(`${BASE}/characters/:id/inventory`, async () => {
+  http.get(`*/api/characters/:id/inventory`, async () => {
     await delay(DELAY);
     const result = [...inventory.values()].map((inv) => {
       const item = mockItems.find((it) => it.id === inv.itemId);
@@ -309,14 +330,14 @@ export const handlers = [
     return HttpResponse.json(result);
   }),
 
-  http.post(`${BASE}/characters/:id/inventory/:itemId/equip`, async ({ params }) => {
+  http.post(`*/api/characters/:id/inventory/:itemId/equip`, async ({ params }) => {
     await delay(DELAY);
     const entry = inventory.get(params.itemId as string);
     if (entry) entry.equipped = true;
     return HttpResponse.json(null, { status: 204 });
   }),
 
-  http.post(`${BASE}/characters/:id/inventory/:itemId/unequip`, async ({ params }) => {
+  http.post(`*/api/characters/:id/inventory/:itemId/unequip`, async ({ params }) => {
     await delay(DELAY);
     const entry = inventory.get(params.itemId as string);
     if (entry) entry.equipped = false;
@@ -324,7 +345,7 @@ export const handlers = [
   }),
 
   // ── Shop ──────────────────────────────────────────────
-  http.get(`${BASE}/shop/items`, async () => {
+  http.get(`*/api/shop/items`, async () => {
     await delay(DELAY);
     return HttpResponse.json(
       mockItems.map((i) => ({
@@ -334,8 +355,9 @@ export const handlers = [
     );
   }),
 
-  http.post(`${BASE}/characters/:id/shop/buy/:itemId`, async ({ params }) => {
+  http.post(`*/api/characters/:id/shop/buy/:itemId`, async ({ params }) => {
     await delay(DELAY);
+    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const item = mockItems.find((it) => it.id === params.itemId);
     if (!item) return HttpResponse.json({ detail: "Item não encontrado." }, { status: 404 });
     if (character.ryous < item.price) {
@@ -352,47 +374,48 @@ export const handlers = [
   }),
 
   // ── Ranking ───────────────────────────────────────────
-  http.get(`${BASE}/ranking`, async () => {
+  http.get(`*/api/ranking`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockRanking);
   }),
 
   // ── Clans ─────────────────────────────────────────────
-  http.get(`${BASE}/clans/me`, async () => {
+  http.get(`*/api/clans/me`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockPlayerClan);
   }),
 
-  http.post(`${BASE}/clans/donate`, async ({ request }) => {
+  http.post(`*/api/clans/donate`, async ({ request }) => {
     await delay(DELAY);
     const body = (await request.json()) as { amount: number };
     return HttpResponse.json({ ok: true, amount: body.amount });
   }),
 
-  http.post(`${BASE}/clans`, async () => {
+  http.post(`*/api/clans`, async () => {
     await delay(DELAY);
     return HttpResponse.json(null, { status: 201 });
   }),
 
-  http.post(`${BASE}/clans/:id/join`, async () => {
+  http.post(`*/api/clans/:id/join`, async () => {
     await delay(DELAY);
     return HttpResponse.json(null, { status: 204 });
   }),
 
   // ── World ─────────────────────────────────────────────
-  http.get(`${BASE}/world/locations`, async () => {
+  http.get(`*/api/world/locations`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockLocations);
   }),
 
-  http.post(`${BASE}/world/travel/:id`, async ({ params }) => {
+  http.post(`*/api/world/travel/:id`, async ({ params }) => {
     await delay(DELAY);
     return HttpResponse.json({ ok: true, locationId: params.id });
   }),
 
   // ── Hunts ─────────────────────────────────────────────
-  http.get(`${BASE}/characters/:id/hunts/status`, async () => {
+  http.get(`*/api/characters/:id/hunts/status`, async () => {
     await delay(DELAY);
+    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const status: HuntStatus = {
       active: false,
       huntLevel: 0,
@@ -410,63 +433,78 @@ export const handlers = [
     return HttpResponse.json(status);
   }),
 
-  http.post(`${BASE}/characters/:id/hunts/start`, async ({ request }) => {
+  http.post(`*/api/characters/:id/hunts/start`, async () => {
     await delay(DELAY);
-    const body = (await request.json()) as { durationMinutes: number };
+    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     return HttpResponse.json(null, { status: 204 });
   }),
 
-  http.post(`${BASE}/characters/:id/hunts/complete`, async () => {
+  http.post(`*/api/characters/:id/hunts/complete`, async () => {
     await delay(DELAY);
+    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
     const xp = 150;
     const ryous = 200;
-    character.xp += xp;
     character.ryous += ryous;
-    return HttpResponse.json({ xp, ryous, durationMinutes: 30 });
+    const level = applyXp(xp);
+    return HttpResponse.json({ xp, ryous, durationMinutes: 30, leveledUp: level.leveledUp, newLevel: level.newLevel });
   }),
 
   // ── Battles ───────────────────────────────────────────
-  http.post(`${BASE}/characters/:id/battles/npc`, async () => {
+  http.post(`*/api/characters/:id/battles/npc`, async () => {
     await delay(DELAY);
+    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    const xp = 150;
+    const ryous = 120;
+    character.ryous += ryous;
+    const level = applyXp(xp);
     return HttpResponse.json({
       result: "Vitoria",
       enemyName: "Bandido Errante",
       enemyLevel: 16,
       difficulty: "normal",
-      xpReward: 150,
-      ryousReward: 120,
+      xpReward: xp,
+      ryousReward: ryous,
       playerLevel: character.level,
       playerGraduation: character.graduation,
       playerPower: character.power,
       enemyPower: 3500,
       powerComparison: "Esmagadora",
+      leveledUp: level.leveledUp,
+      newLevel: level.newLevel,
     });
   }),
 
-  http.post(`${BASE}/characters/:id/battles/pvp`, async () => {
+  http.post(`*/api/characters/:id/battles/pvp`, async () => {
     await delay(DELAY);
+    if (!character) return HttpResponse.json({ detail: "Personagem não encontrado." }, { status: 404 });
+    const xp = 200;
+    const ryous = 180;
+    character.ryous += ryous;
+    const level = applyXp(xp);
     return HttpResponse.json({
       result: "Vitoria",
       enemyName: "Ninja Oponente",
       enemyLevel: character.level + 1,
       difficulty: "pvp",
-      xpReward: 200,
-      ryousReward: 180,
+      xpReward: xp,
+      ryousReward: ryous,
       playerLevel: character.level,
       playerGraduation: character.graduation,
       playerPower: character.power,
       enemyPower: character.power + 500,
       powerComparison: "Equilibrado",
+      leveledUp: level.leveledUp,
+      newLevel: level.newLevel,
     });
   }),
 
   // ── Admin ─────────────────────────────────────────────
-  http.get(`${BASE}/admin/dashboard`, async () => {
+  http.get(`*/api/admin/dashboard`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockAdminDashboard);
   }),
 
-  http.get(`${BASE}/admin/users`, async () => {
+  http.get(`*/api/admin/users`, async () => {
     await delay(DELAY);
     return HttpResponse.json(
       mockAdminUsers.map((u) => ({
@@ -482,74 +520,74 @@ export const handlers = [
     );
   }),
 
-  http.post(`${BASE}/admin/users/:id/ban`, async () => {
+  http.post(`*/api/admin/users/:id/ban`, async () => {
     await delay(DELAY);
     return HttpResponse.json(null, { status: 204 });
   }),
 
-  http.post(`${BASE}/admin/users/:id/unban`, async () => {
+  http.post(`*/api/admin/users/:id/unban`, async () => {
     await delay(DELAY);
     return HttpResponse.json(null, { status: 204 });
   }),
 
-  http.put(`${BASE}/admin/users/:id/role`, async () => {
+  http.put(`*/api/admin/users/:id/role`, async () => {
     await delay(DELAY);
     return HttpResponse.json(null, { status: 204 });
   }),
 
-  http.get(`${BASE}/admin/characters`, async () => {
+  http.get(`*/api/admin/characters`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockAdminCharacters);
   }),
 
-  http.get(`${BASE}/admin/characters/:id`, async ({ params }) => {
+  http.get(`*/api/admin/characters/:id`, async ({ params }) => {
     await delay(DELAY);
     const found = mockAdminCharacters.find((c) => c.id === params.id);
     if (!found) return HttpResponse.json({ detail: "Não encontrado." }, { status: 404 });
     return HttpResponse.json(found);
   }),
 
-  http.put(`${BASE}/admin/characters/:id`, async () => {
+  http.put(`*/api/admin/characters/:id`, async () => {
     await delay(DELAY);
     return HttpResponse.json(null, { status: 204 });
   }),
 
-  http.post(`${BASE}/admin/characters/:id/reset`, async () => {
+  http.post(`*/api/admin/characters/:id/reset`, async () => {
     await delay(DELAY);
     return HttpResponse.json(null, { status: 204 });
   }),
 
-  http.post(`${BASE}/admin/characters/:id/block`, async () => {
+  http.post(`*/api/admin/characters/:id/block`, async () => {
     await delay(DELAY);
     return HttpResponse.json(null, { status: 204 });
   }),
 
-  http.get(`${BASE}/admin/villages`, async () => {
+  http.get(`*/api/admin/villages`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockAdminVillages);
   }),
 
-  http.get(`${BASE}/admin/battles`, async () => {
+  http.get(`*/api/admin/battles`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockAdminBattles);
   }),
 
-  http.get(`${BASE}/admin/rankings`, async () => {
+  http.get(`*/api/admin/rankings`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockAdminRankings);
   }),
 
-  http.get(`${BASE}/admin/audit`, async () => {
+  http.get(`*/api/admin/audit`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockAdminAuditLogs);
   }),
 
-  http.get(`${BASE}/admin/settings`, async () => {
+  http.get(`*/api/admin/settings`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockBalanceSettings);
   }),
 
-  http.get(`${BASE}/events`, async () => {
+  http.get(`*/api/events`, async () => {
     await delay(DELAY);
     return HttpResponse.json(mockAdminEvents);
   }),

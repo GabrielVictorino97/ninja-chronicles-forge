@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { SectionTitle } from "@/components/game/SectionTitle";
 import { RankBadge } from "@/components/game/RankBadge";
 import { missionService } from "@/services/missionService";
+import { characterService } from "@/services/characterService";
 import { useGameStore } from "@/store/gameStore";
 import { ScrollText, Coins, Zap, Star, Play, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -22,8 +23,7 @@ function MissionsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Rank | "ALL">("ALL");
   const character = useGameStore((s) => s.character);
-  const gainXp = useGameStore((s) => s.gainXp);
-  const gainRyous = useGameStore((s) => s.gainRyous);
+  const setCharacter = useGameStore((s) => s.setCharacter);
 
   useEffect(() => {
     missionService.list().then(setMissions).catch(() => setMissions([])).finally(() => setLoading(false));
@@ -43,12 +43,13 @@ function MissionsPage() {
   async function complete(missionId: string) {
     if (!character) return;
     try {
+      const prevLevel = character.level;
       const r = await missionService.complete(character.id, missionId);
-      const result = gainXp(r.xp);
-      gainRyous(r.ryous);
+      const updated = await characterService.get();
+      setCharacter(updated);
       toast.success(`Missão concluída! +${r.xp} XP, +${r.ryous} ryous`);
-      if (result.leveledUp) {
-        toast.success(`Subiu de nível! Agora você é nível ${result.newLevel}.`);
+      if (r.leveledUp || updated.level > prevLevel) {
+        toast.success(`Subiu de nível! Agora você é nível ${updated.level}.`);
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao concluir missão");

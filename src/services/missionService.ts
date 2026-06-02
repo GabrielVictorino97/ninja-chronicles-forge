@@ -18,6 +18,8 @@ interface CompleteMissionResponse {
   xp: number;
   ryous: number;
   drops: string[];
+  leveledUp?: boolean;
+  newLevel?: number;
 }
 
 export const missionService = {

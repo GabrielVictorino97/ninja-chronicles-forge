@@ -5,6 +5,8 @@ export interface HuntReward {
   xp: number;
   ryous: number;
   durationMinutes: number;
+  leveledUp?: boolean;
+  newLevel?: number;
 }
 
 export const huntService = {

@@ -16,6 +16,8 @@ export interface BattleResult {
   playerPower: number;
   enemyPower: number;
   powerComparison: string;
+  leveledUp?: boolean;
+  newLevel?: number;
 }
 
 export const npcBattle = (characterId: string, difficulty: Difficulty) =>
