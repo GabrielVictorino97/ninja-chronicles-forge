@@ -91,35 +91,20 @@ export const handlers = [
         { status: 400 },
       );
     }
-    const res: AuthResponse = {
-      accessToken: MOCK_JWT,
-      refreshToken: MOCK_REFRESH,
-      user: { ...mockUser, role: "Player" },
-    };
-    return HttpResponse.json(res);
-  }),
-
-  http.post(`*/api/auth/register`, async ({ request }) => {
-    await delay(DELAY);
-    const body = (await request.json()) as { name: string; email: string; password: string };
-    if (!body.name || !body.email || !body.password) {
-      return HttpResponse.json(
-        { errors: { name: ["Todos os campos são obrigatórios."] } },
-        { status: 400 },
-      );
+    if (body.email !== "admin@kagenotessen.gg" || body.password !== "Admin123!") {
+      return HttpResponse.json({ detail: "Credenciais inválidas." }, { status: 401 });
     }
     const res: AuthResponse = {
       accessToken: MOCK_JWT,
       refreshToken: MOCK_REFRESH,
-      user: {
-        id: "u1",
-        email: body.email,
-        name: body.name,
-        createdAt: new Date().toISOString(),
-        role: "Player",
-      },
+      user: { ...mockUser, role: "Admin" },
     };
     return HttpResponse.json(res);
+  }),
+
+  http.post(`*/api/auth/register`, async () => {
+    await delay(DELAY);
+    return HttpResponse.json({ detail: "Registros desabilitados no momento." }, { status: 403 });
   }),
 
   http.post(`*/api/auth/refresh`, async () => {
@@ -218,10 +203,7 @@ export const handlers = [
     if (body.attributes) {
       const total = Object.values(body.attributes).reduce((s, v) => s + v, 0);
       if (total > character.unspentPoints) {
-        return HttpResponse.json(
-          { detail: "Pontos insuficientes." },
-          { status: 400 },
-        );
+        return HttpResponse.json({ detail: "Pontos insuficientes." }, { status: 400 });
       }
       for (const [k, v] of Object.entries(body.attributes)) {
         const key = k as keyof BaseAttributes;

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,7 +42,7 @@ function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { email: "shinobi@vila.gg", password: "123456" },
+    defaultValues: { email: "admin@kagenotessen.gg", password: "" },
   });
 
   async function doLogin(email: string, password: string) {
@@ -91,24 +91,18 @@ function LoginPage() {
           onClick={async () => {
             setDemoLoading(true);
             try {
-              await doLogin("shinobi@vila.gg", "123456");
-              toast.success("Bem-vindo, shinobi!");
+              await doLogin("admin@kagenotessen.gg", "Admin123!");
+              toast.success("Bem-vindo, Admin!");
             } catch (e) {
-              toast.error(e instanceof Error ? e.message : "Falha ao entrar como demo");
+              toast.error(e instanceof Error ? e.message : "Falha ao entrar como admin");
             } finally {
               setDemoLoading(false);
             }
           }}
         >
           {demoLoading ? <Loader2 className="size-4 animate-spin" /> : null}
-          Entrar como demo
+          Entrada rápida
         </Button>
-        <p className="text-center text-sm text-muted-foreground">
-          Não tem conta?{" "}
-          <Link to="/register" className="font-semibold text-primary hover:underline">
-            Criar agora
-          </Link>
-        </p>
       </form>
     </AuthShell>
   );

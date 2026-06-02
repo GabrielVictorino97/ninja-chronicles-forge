@@ -1,9 +1,9 @@
 import type { Character, User, Notification } from "@/types";
 
 export const mockUser: User = {
-  id: "u1",
-  email: "shinobi@vila.gg",
-  name: "Shinobi Anônimo",
+  id: "u-admin",
+  email: "admin@kagenotessen.gg",
+  name: "Admin",
   createdAt: new Date().toISOString(),
 };
 

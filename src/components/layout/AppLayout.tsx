@@ -94,8 +94,13 @@ export function AppLayout() {
   }, [isAuthenticated, hydrate, navigate]);
 
   useEffect(() => {
-    if (isAuthenticated && !hasCharacter && path !== "/create-character") {
-      navigate({ to: "/create-character" });
+    if (
+      isAuthenticated &&
+      !hasCharacter &&
+      path !== "/create-character" &&
+      path !== "/select-character"
+    ) {
+      navigate({ to: "/select-character" });
     }
   }, [isAuthenticated, hasCharacter, path, navigate]);
 

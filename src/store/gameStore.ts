@@ -31,6 +31,7 @@ export const useGameStore = create<GameState>()(
       login: (user) => set({ isAuthenticated: true, user }),
       logout: () => {
         void authService.logout();
+        tokenStorage.clear();
         set({
           isAuthenticated: false,
           user: null,
@@ -38,6 +39,12 @@ export const useGameStore = create<GameState>()(
           hasCharacter: false,
           characters: [],
         });
+        // Remove a sessão persistida para não restaurar cache de outro usuário.
+        try {
+          localStorage.removeItem("naruto-players-fan-game");
+        } catch {
+          // localStorage pode não estar disponível (SSR).
+        }
       },
       setCharacters: (list) => set({ characters: list }),
       setCharacter: (c) => set({ character: c, hasCharacter: !!c }),

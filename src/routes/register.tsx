@@ -23,13 +23,7 @@ type FormData = z.infer<typeof schema>;
 
 export const Route = createFileRoute("/register")({
   beforeLoad: async () => {
-    const state = useGameStore.getState();
-    if (state.isAuthenticated && state.hasCharacter) {
-      throw redirect({ to: "/dashboard" });
-    }
-    if (state.isAuthenticated && !state.hasCharacter) {
-      throw redirect({ to: "/create-character" });
-    }
+    throw redirect({ to: "/login" });
   },
   component: RegisterPage,
   head: () => ({ meta: [{ title: "Criar conta — Naruto Players Fan Game" }] }),
