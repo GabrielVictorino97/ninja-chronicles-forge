@@ -11,9 +11,14 @@ import { User, Plus, Minus, Save, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const ATTR_LABELS: Record<keyof BaseAttributes, string> = {
-  taijutsu: "Taijutsu", ninjutsu: "Ninjutsu", genjutsu: "Genjutsu",
-  intelligence: "Inteligência", vitality: "Vitalidade", chakra: "Chakra",
-  agility: "Agilidade", luck: "Sorte",
+  taijutsu: "Taijutsu",
+  ninjutsu: "Ninjutsu",
+  genjutsu: "Genjutsu",
+  intelligence: "Inteligência",
+  vitality: "Vitalidade",
+  chakra: "Chakra",
+  agility: "Agilidade",
+  luck: "Sorte",
 };
 
 // Derived attribute formulas are illustrative — backend will be authoritative.
@@ -60,7 +65,10 @@ function CharacterPage() {
 
   useEffect(() => {
     Promise.all([characterService.listVillages(), characterService.listBloodlineClans()])
-      .then(([v, c]) => { setVillages(v); setClans(c); })
+      .then(([v, c]) => {
+        setVillages(v);
+        setClans(c);
+      })
       .catch(() => {});
   }, []);
 
@@ -73,7 +81,8 @@ function CharacterPage() {
 
   if (!stored || !draft) return null;
   const used = (Object.keys(draft) as (keyof BaseAttributes)[]).reduce(
-    (sum, k) => sum + (draft[k] - stored.attributes[k]), 0,
+    (sum, k) => sum + (draft[k] - stored.attributes[k]),
+    0,
   );
   const remaining = stored.unspentPoints - used;
   const derived = deriveAttributes(draft, stored.level);
@@ -95,21 +104,36 @@ function CharacterPage() {
 
   return (
     <div className="space-y-6">
-      <SectionTitle title="Personagem" icon={<User className="size-6 text-primary" />}
-        description="Detalhes, atributos e progressão." />
+      <SectionTitle
+        title="Personagem"
+        icon={<User className="size-6 text-primary" />}
+        description="Detalhes, atributos e progressão."
+      />
 
       <Card className="bg-scroll-paper shadow-card">
         <CardContent className="grid gap-4 p-6 md:grid-cols-3">
           <div className="flex items-center gap-4">
-            <div className="grid size-20 place-items-center rounded-2xl bg-primary/20 text-4xl ring-2 ring-primary/40">{stored.avatar}</div>
+            <div className="grid size-20 place-items-center rounded-2xl bg-primary/20 text-4xl ring-2 ring-primary/40">
+              {stored.avatar}
+            </div>
             <div>
               <div className="text-xl font-black">{stored.name}</div>
-              <div className="text-sm text-muted-foreground">{villages.find(v => v.id === stored.villageId)?.name ?? "Vila"} • {clans.find(c => c.id === stored.clanId)?.name ?? "Clã"}</div>
-              <div className="text-xs text-muted-foreground">Graduação: <span className="font-semibold text-primary">{stored.graduation}</span></div>
+              <div className="text-sm text-muted-foreground">
+                {villages.find((v) => v.id === stored.villageId)?.name ?? "Vila"} •{" "}
+                {clans.find((c) => c.id === stored.clanId)?.name ?? "Clã"}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Graduação: <span className="font-semibold text-primary">{stored.graduation}</span>
+              </div>
             </div>
           </div>
           <div className="space-y-2">
-            <StatBar label={`Lv ${stored.level} • XP`} value={stored.xp} max={stored.xpToNext} tone="xp" />
+            <StatBar
+              label={`Lv ${stored.level} • XP`}
+              value={stored.xp}
+              max={stored.xpToNext}
+              tone="xp"
+            />
             <StatBar label="HP" value={stored.hp} max={stored.hpMax} tone="hp" />
             <StatBar label="Chakra" value={stored.chakra} max={stored.chakraMax} tone="chakra" />
           </div>
@@ -118,7 +142,9 @@ function CharacterPage() {
             <div className="text-lg font-bold">{nextGrad?.next}</div>
             <div className="mt-1 text-xs text-muted-foreground">Requer nível {nextGrad?.level}</div>
             <div className="mt-3 text-xs text-muted-foreground">Poder total</div>
-            <div className="text-xl font-black text-gradient-primary">{stored.power.toLocaleString()}</div>
+            <div className="text-xl font-black text-gradient-primary">
+              {stored.power.toLocaleString()}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -128,24 +154,40 @@ function CharacterPage() {
           <CardHeader className="flex-row items-center justify-between">
             <CardTitle>Atributos base</CardTitle>
             <div className="flex items-center gap-2">
-              <span className="rounded-md bg-primary/15 px-2 py-1 text-xs font-bold text-primary">Pontos: {remaining}</span>
+              <span className="rounded-md bg-primary/15 px-2 py-1 text-xs font-bold text-primary">
+                Pontos: {remaining}
+              </span>
               <Button size="sm" disabled={remaining < 0 || used === 0 || saving} onClick={save}>
-                {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />} Salvar
+                {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}{" "}
+                Salvar
               </Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-2">
             {(Object.keys(draft) as (keyof BaseAttributes)[]).map((k) => (
-              <div key={k} className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2">
+              <div
+                key={k}
+                className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2"
+              >
                 <div className="text-sm font-medium">{ATTR_LABELS[k]}</div>
                 <div className="flex items-center gap-2">
-                  <Button size="icon" variant="outline" disabled={draft[k] <= stored.attributes[k]}
-                    onClick={() => setDraft({ ...draft, [k]: draft[k] - 1 })}>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    disabled={draft[k] <= stored.attributes[k]}
+                    onClick={() => setDraft({ ...draft, [k]: draft[k] - 1 })}
+                  >
                     <Minus className="size-3" />
                   </Button>
-                  <span className="w-10 text-center text-base font-bold tabular-nums">{draft[k]}</span>
-                  <Button size="icon" variant="outline" disabled={remaining <= 0}
-                    onClick={() => setDraft({ ...draft, [k]: draft[k] + 1 })}>
+                  <span className="w-10 text-center text-base font-bold tabular-nums">
+                    {draft[k]}
+                  </span>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    disabled={remaining <= 0}
+                    onClick={() => setDraft({ ...draft, [k]: draft[k] + 1 })}
+                  >
                     <Plus className="size-3" />
                   </Button>
                 </div>
@@ -155,7 +197,9 @@ function CharacterPage() {
         </Card>
 
         <Card className="shadow-card">
-          <CardHeader><CardTitle>Atributos derivados</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Atributos derivados</CardTitle>
+          </CardHeader>
           <CardContent className="grid grid-cols-2 gap-2 text-sm">
             <Derived label="HP máximo" value={derived.hpMax} />
             <Derived label="Chakra máximo" value={derived.chakraMax} />
@@ -174,7 +218,9 @@ function CharacterPage() {
       </div>
 
       <Card className="shadow-card">
-        <CardHeader><CardTitle>Histórico de evolução</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Histórico de evolução</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-1.5 text-sm">
           {[
             { date: "hoje", event: `Subiu para nível ${stored.level}` },
@@ -182,7 +228,10 @@ function CharacterPage() {
             { date: "há 2 dias", event: "Aprendeu Katon: Goukakyuu no Jutsu" },
             { date: "há 4 dias", event: "Promovido a Chunin" },
           ].map((h, i) => (
-            <div key={i} className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2">
+            <div
+              key={i}
+              className="flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2"
+            >
               <span>{h.event}</span>
               <span className="text-xs text-muted-foreground">{h.date}</span>
             </div>

@@ -23,7 +23,7 @@ interface ItemDto {
 export const shopService = {
   async list(): Promise<Item[]> {
     const items = await apiClient.get<ItemDto[]>("/shop/items", { auth: false });
-    return items.map(i => ({
+    return items.map((i) => ({
       id: i.id,
       name: i.name,
       type: i.type as Item["type"],

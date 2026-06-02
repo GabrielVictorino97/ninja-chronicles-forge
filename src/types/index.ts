@@ -16,12 +16,7 @@ export type Graduation =
   | "ANBU"
   | "Kage";
 
-export type ElementAffinity =
-  | "Katon"
-  | "Suiton"
-  | "Doton"
-  | "Fuuton"
-  | "Raiton";
+export type ElementAffinity = "Katon" | "Suiton" | "Doton" | "Fuuton" | "Raiton";
 
 export type VillageId = string;
 
@@ -46,8 +41,16 @@ export interface BloodlineClan {
 }
 
 export type JutsuType =
-  | "Taijutsu" | "Ninjutsu" | "Genjutsu" | "Fuinjutsu" | "Iryo Ninjutsu"
-  | "Senjutsu" | "Doujutsu" | "Kinjutsu" | "Kuchiyose" | "Kekkei Genkai";
+  | "Taijutsu"
+  | "Ninjutsu"
+  | "Genjutsu"
+  | "Fuinjutsu"
+  | "Iryo Ninjutsu"
+  | "Senjutsu"
+  | "Doujutsu"
+  | "Kinjutsu"
+  | "Kuchiyose"
+  | "Kekkei Genkai";
 
 export interface Jutsu {
   id: ID;
@@ -134,8 +137,7 @@ export interface Mission {
   requirements: { graduation?: Graduation; level?: number };
 }
 
-export type ItemType =
-  | "weapon" | "armor" | "accessory" | "tool" | "consumable" | "summon";
+export type ItemType = "weapon" | "armor" | "accessory" | "tool" | "consumable" | "summon";
 
 export type ItemRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
 
@@ -156,8 +158,7 @@ export interface InventoryItem {
   slot?: EquipSlot;
 }
 
-export type EquipSlot =
-  | "weapon" | "armor" | "accessory1" | "accessory2" | "tool" | "summon";
+export type EquipSlot = "weapon" | "armor" | "accessory1" | "accessory2" | "tool" | "summon";
 
 export interface BattleActor {
   id: ID;

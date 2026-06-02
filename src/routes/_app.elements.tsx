@@ -37,7 +37,9 @@ function ElementsPage() {
     }
   }
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    refresh();
+  }, []);
 
   if (!character) return null;
 
@@ -52,7 +54,9 @@ function ElementsPage() {
       await refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao aprender elemento");
-    } finally { setBusy(null); }
+    } finally {
+      setBusy(null);
+    }
   }
 
   return (
@@ -85,7 +89,9 @@ function ElementsPage() {
                     <span className="font-bold">{el.requiredLevel}</span>
                   </div>
                   {el.learned ? (
-                    <Button size="sm" disabled variant="secondary">Aprendido</Button>
+                    <Button size="sm" disabled variant="secondary">
+                      Aprendido
+                    </Button>
                   ) : canLearn ? (
                     <Button size="sm" onClick={() => learn(el.name)} disabled={busy === el.name}>
                       Aprender

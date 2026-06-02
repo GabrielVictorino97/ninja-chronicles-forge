@@ -20,9 +20,7 @@ export function SectionTitle({
           {icon}
           <span className="text-gradient-primary">{title}</span>
         </h1>
-        {description && (
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-        )}
+        {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       </div>
       {action}
     </div>

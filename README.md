@@ -40,11 +40,11 @@ A aplicação sobe em `http://localhost:5173`.
 
 ### Scripts úteis
 
-| Comando | Descrição |
-|---|---|
-| `bun run dev` | Ambiente de desenvolvimento |
-| `bun run build` | Build de produção |
-| `bun run start` | Roda o build de produção |
+| Comando         | Descrição                   |
+| --------------- | --------------------------- |
+| `bun run dev`   | Ambiente de desenvolvimento |
+| `bun run build` | Build de produção           |
+| `bun run start` | Roda o build de produção    |
 
 ---
 
@@ -53,11 +53,13 @@ A aplicação sobe em `http://localhost:5173`.
 O protótipo já vem com **dados de demonstração** semeados automaticamente.
 
 ### Game Client
+
 - Acesse `/login`
 - Use as credenciais pré-preenchidas (`shinobi@vila.gg` / `123456`) **ou** clique em **“Entrar como demo”**
 - Você será redirecionado para `/dashboard`
 
 ### Painel Administrativo
+
 - Acesse diretamente **`/admin`** (ou `/admin/dashboard`)
 - O controle de acesso real será implementado pelo backend C#; no protótipo a rota está liberada para facilitar a navegação
 
@@ -103,8 +105,7 @@ export const characterService = {
 
 // Depois (API real)
 export const characterService = {
-  get: (id: string) =>
-    fetch(`/api/characters/${id}`).then((r) => r.json()),
+  get: (id: string) => fetch(`/api/characters/${id}`).then((r) => r.json()),
 };
 ```
 
@@ -123,6 +124,7 @@ Endpoints sugeridos seguem o nome de cada service (`adminUserService` → `/api/
 ## ✅ Funcionalidades implementadas (mock)
 
 **Game**
+
 - Login / Registro / Criação de personagem
 - Dashboard com status, missões e atalhos
 - Missões simuladas (iniciar, recompensa)
@@ -132,6 +134,7 @@ Endpoints sugeridos seguem o nome de cada service (`adminUserService` → `/api/
 - Transições suaves entre telas
 
 **Admin**
+
 - Dashboard com métricas e gráficos SVG (sem libs externas)
 - CRUDs genéricos via componente `CrudPage<T>`
 - Gestão de usuários (banir, bloquear, mudar role) e personagens (resetar, bloquear)

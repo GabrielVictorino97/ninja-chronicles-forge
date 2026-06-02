@@ -1,4 +1,11 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ReactNode } from "react";
 
 export interface Column<T> {
@@ -9,7 +16,9 @@ export interface Column<T> {
 }
 
 export function DataTable<T extends { id: string }>({
-  columns, rows, empty = "Sem registros",
+  columns,
+  rows,
+  empty = "Sem registros",
 }: {
   columns: Column<T>[];
   rows: T[];
@@ -21,14 +30,19 @@ export function DataTable<T extends { id: string }>({
         <TableHeader>
           <TableRow className="bg-muted/30 hover:bg-muted/30">
             {columns.map((c) => (
-              <TableHead key={c.key} className={c.className}>{c.label}</TableHead>
+              <TableHead key={c.key} className={c.className}>
+                {c.label}
+              </TableHead>
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
           {rows.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={columns.length} className="text-center text-muted-foreground py-10">
+              <TableCell
+                colSpan={columns.length}
+                className="text-center text-muted-foreground py-10"
+              >
                 {empty}
               </TableCell>
             </TableRow>
@@ -50,8 +64,14 @@ export function DataTable<T extends { id: string }>({
 }
 
 export function PageHeader({
-  title, description, actions,
-}: { title: string; description?: string; actions?: ReactNode }) {
+  title,
+  description,
+  actions,
+}: {
+  title: string;
+  description?: string;
+  actions?: ReactNode;
+}) {
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
       <div>
@@ -63,7 +83,13 @@ export function PageHeader({
   );
 }
 
-export function StatusPill({ tone, children }: { tone: "success" | "danger" | "warn" | "info" | "muted"; children: ReactNode }) {
+export function StatusPill({
+  tone,
+  children,
+}: {
+  tone: "success" | "danger" | "warn" | "info" | "muted";
+  children: ReactNode;
+}) {
   const toneCls: Record<string, string> = {
     success: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     danger: "bg-rose-500/15 text-rose-400 border-rose-500/30",
@@ -72,7 +98,9 @@ export function StatusPill({ tone, children }: { tone: "success" | "danger" | "w
     muted: "bg-muted text-muted-foreground border-border",
   };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${toneCls[tone]}`}>
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${toneCls[tone]}`}
+    >
       {children}
     </span>
   );

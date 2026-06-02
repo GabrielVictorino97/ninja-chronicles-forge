@@ -1,4 +1,15 @@
-import type { ID, Rank, Graduation, ElementAffinity, JutsuType, ItemType, ItemRarity, BaseAttributes, VillageId, BloodlineClanId } from "./index";
+import type {
+  ID,
+  Rank,
+  Graduation,
+  ElementAffinity,
+  JutsuType,
+  ItemType,
+  ItemRarity,
+  BaseAttributes,
+  VillageId,
+  BloodlineClanId,
+} from "./index";
 
 export type AdminRole = "Player" | "Moderator" | "Admin" | "SuperAdmin";
 export type UserStatus = "active" | "banned" | "blocked" | "pending";
@@ -53,9 +64,21 @@ export interface AdminBloodlineClan {
 }
 
 export type MissionType =
-  | "Entrega" | "Patrulha" | "Escolta" | "Investigação" | "Captura"
-  | "Defesa da vila" | "Assassinato" | "Infiltração" | "Resgate"
-  | "Treinamento" | "Boss" | "História" | "Diária" | "Semanal" | "Clã";
+  | "Entrega"
+  | "Patrulha"
+  | "Escolta"
+  | "Investigação"
+  | "Captura"
+  | "Defesa da vila"
+  | "Assassinato"
+  | "Infiltração"
+  | "Resgate"
+  | "Treinamento"
+  | "Boss"
+  | "História"
+  | "Diária"
+  | "Semanal"
+  | "Clã";
 
 export interface AdminMission {
   id: ID;
@@ -96,7 +119,15 @@ export interface AdminJutsu {
   active: boolean;
 }
 
-export type AdminItemType = "Arma" | "Armadura" | "Acessório" | "Ferramenta Ninja" | "Consumível" | "Pergaminho" | "Material" | "Evento";
+export type AdminItemType =
+  | "Arma"
+  | "Armadura"
+  | "Acessório"
+  | "Ferramenta Ninja"
+  | "Consumível"
+  | "Pergaminho"
+  | "Material"
+  | "Evento";
 export type AdminItemRarity = "Comum" | "Incomum" | "Raro" | "Épico" | "Lendário" | "Mítico";
 
 export interface AdminItem {

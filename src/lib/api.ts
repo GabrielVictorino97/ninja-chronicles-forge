@@ -7,8 +7,7 @@
 import { logger } from "@/lib/logger";
 
 const BASE_URL =
-  (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
-  "http://localhost:5271/api";
+  (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://localhost:5271/api";
 
 const ACCESS_KEY = "ncf.accessToken";
 const REFRESH_KEY = "ncf.refreshToken";
@@ -93,7 +92,10 @@ async function tryRefresh(): Promise<boolean> {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accessToken: access, refreshToken: refresh }),
       });
-      if (!res.ok) { tokenStorage.clear(); return false; }
+      if (!res.ok) {
+        tokenStorage.clear();
+        return false;
+      }
       const data = (await res.json()) as { accessToken: string; refreshToken: string };
       tokenStorage.set(data.accessToken, data.refreshToken);
       return true;
@@ -117,7 +119,9 @@ export interface ApiOptions {
 
 export async function api<T = unknown>(path: string, opts: ApiOptions = {}): Promise<T> {
   const { method = "GET", body, auth = true, signal, skipRefresh } = opts;
-  const url = path.startsWith("http") ? path : `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  const url = path.startsWith("http")
+    ? path
+    : `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 
   const headers: Record<string, string> = {};
   if (body !== undefined) headers["Content-Type"] = "application/json";
@@ -145,16 +149,20 @@ export async function api<T = unknown>(path: string, opts: ApiOptions = {}): Pro
             Method: method,
             Path: path,
           });
-          throw new ApiError(0,
+          throw new ApiError(
+            0,
             `Servidor inacessível (${BASE_URL}). Verifique se o backend está rodando.`,
-            null);
+            null,
+          );
         }
         await new Promise((r) => setTimeout(r, 300));
       }
     }
-    throw new ApiError(0,
+    throw new ApiError(
+      0,
       `Servidor inacessível (${BASE_URL}). Verifique se o backend está rodando.`,
-      null);
+      null,
+    );
   }
 
   let res: Response;
@@ -174,9 +182,11 @@ export async function api<T = unknown>(path: string, opts: ApiOptions = {}): Pro
         res = await doFetch(1);
       } catch {
         logger.error(`API offline (retry): ${method} ${path}`);
-        throw new ApiError(0,
+        throw new ApiError(
+          0,
           `Servidor inacessível (${BASE_URL}). Verifique se o backend está rodando.`,
-          null);
+          null,
+        );
       }
     } else {
       tokenStorage.clear();

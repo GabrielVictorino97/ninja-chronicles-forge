@@ -31,7 +31,13 @@ export const useGameStore = create<GameState>()(
       login: (user) => set({ isAuthenticated: true, user }),
       logout: () => {
         void authService.logout();
-        set({ isAuthenticated: false, user: null, character: null, hasCharacter: false, characters: [] });
+        set({
+          isAuthenticated: false,
+          user: null,
+          character: null,
+          hasCharacter: false,
+          characters: [],
+        });
       },
       setCharacters: (list) => set({ characters: list }),
       setCharacter: (c) => set({ character: c, hasCharacter: !!c }),

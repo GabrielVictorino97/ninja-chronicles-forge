@@ -31,9 +31,10 @@ function BattlePage() {
     setBusy(true);
     setResult(null);
     try {
-      const r = tab === "npc"
-        ? await npcBattle(character.id, difficulty)
-        : await pvpBattle(character.id, target.trim());
+      const r =
+        tab === "npc"
+          ? await npcBattle(character.id, difficulty)
+          : await pvpBattle(character.id, target.trim());
       setResult(r);
       const prevLevel = character.level;
       const updated = await characterService.get();
@@ -48,7 +49,9 @@ function BattlePage() {
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha na batalha");
-    } finally { setBusy(false); }
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -87,10 +90,15 @@ function BattlePage() {
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Fácil: nível -1 a -10. Normal: ±3. Difícil: +1 a +10. Recompensas escalam com a dificuldade.
+                  Fácil: nível -1 a -10. Normal: ±3. Difícil: +1 a +10. Recompensas escalam com a
+                  dificuldade.
                 </p>
                 <Button onClick={fight} disabled={busy} className="w-full">
-                  {busy ? <Loader2 className="size-4 animate-spin" /> : <Swords className="size-4" />}
+                  {busy ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Swords className="size-4" />
+                  )}
                   Batalhar contra NPC
                 </Button>
               </>
@@ -105,8 +113,16 @@ function BattlePage() {
                 <p className="text-xs text-muted-foreground">
                   Ataca outro jogador. Vitória/derrota é decidida pelo poder de combate de ambos.
                 </p>
-                <Button onClick={fight} disabled={busy || target.trim().length < 2} className="w-full">
-                  {busy ? <Loader2 className="size-4 animate-spin" /> : <Users className="size-4" />}
+                <Button
+                  onClick={fight}
+                  disabled={busy || target.trim().length < 2}
+                  className="w-full"
+                >
+                  {busy ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Users className="size-4" />
+                  )}
                   Atacar jogador
                 </Button>
               </>
@@ -124,9 +140,11 @@ function BattlePage() {
             ) : (
               <>
                 <div className="flex items-center gap-2">
-                  {result.result === "Vitoria"
-                    ? <Trophy className="size-5 text-primary" />
-                    : <Skull className="size-5 text-destructive" />}
+                  {result.result === "Vitoria" ? (
+                    <Trophy className="size-5 text-primary" />
+                  ) : (
+                    <Skull className="size-5 text-destructive" />
+                  )}
                   <span className="text-lg font-bold">
                     {result.result === "Vitoria" ? "Vitória" : "Derrota"}
                   </span>
@@ -136,8 +154,16 @@ function BattlePage() {
                 <Row label="Seu poder" value={result.playerPower.toLocaleString()} />
                 <Row label="Poder inimigo" value={result.enemyPower.toLocaleString()} />
                 <Row label="Comparação" value={result.powerComparison} />
-                <Row label="XP" value={result.xpReward >= 0 ? `+${result.xpReward}` : String(result.xpReward)} />
-                <Row label="Ryous" value={result.ryousReward >= 0 ? `+${result.ryousReward}` : String(result.ryousReward)} />
+                <Row
+                  label="XP"
+                  value={result.xpReward >= 0 ? `+${result.xpReward}` : String(result.xpReward)}
+                />
+                <Row
+                  label="Ryous"
+                  value={
+                    result.ryousReward >= 0 ? `+${result.ryousReward}` : String(result.ryousReward)
+                  }
+                />
               </>
             )}
           </CardContent>

@@ -36,7 +36,11 @@ function LoginPage() {
   const navigate = useNavigate();
   const login = useGameStore((s) => s.login);
   const [demoLoading, setDemoLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { email: "shinobi@vila.gg", password: "123456" },
   });
@@ -72,7 +76,11 @@ function LoginPage() {
           {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
         </div>
         <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : <LogIn className="size-4" />}
+          {isSubmitting ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <LogIn className="size-4" />
+          )}
           Entrar
         </Button>
         <Button
@@ -97,14 +105,24 @@ function LoginPage() {
         </Button>
         <p className="text-center text-sm text-muted-foreground">
           Não tem conta?{" "}
-          <Link to="/register" className="font-semibold text-primary hover:underline">Criar agora</Link>
+          <Link to="/register" className="font-semibold text-primary hover:underline">
+            Criar agora
+          </Link>
         </p>
       </form>
     </AuthShell>
   );
 }
 
-export function AuthShell({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
+export function AuthShell({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="relative grid min-h-screen place-items-center px-4 py-10">
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-50 [mask-image:radial-gradient(circle_at_center,black,transparent_70%)]">

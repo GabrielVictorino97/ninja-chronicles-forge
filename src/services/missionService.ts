@@ -25,22 +25,27 @@ interface CompleteMissionResponse {
 export const missionService = {
   async list(): Promise<Mission[]> {
     const missions = await apiClient.get<MissionDto[]>("/missions", { auth: false });
-    return missions.map(m => ({
-      id: m.id,
-      title: m.title,
-      rank: m.rank as Mission["rank"],
-      description: m.description,
-      energyCost: m.energyCost,
-      xpReward: m.xpReward,
-      ryousReward: m.ryousReward,
-      drops: m.drops,
-      requirements: { graduation: m.requirements.graduation, level: m.requirements.level },
-    } as Mission));
+    return missions.map(
+      (m) =>
+        ({
+          id: m.id,
+          title: m.title,
+          rank: m.rank as Mission["rank"],
+          description: m.description,
+          energyCost: m.energyCost,
+          xpReward: m.xpReward,
+          ryousReward: m.ryousReward,
+          drops: m.drops,
+          requirements: { graduation: m.requirements.graduation, level: m.requirements.level },
+        }) as Mission,
+    );
   },
   async start(characterId: string, missionId: string): Promise<void> {
     return apiClient.post<void>(`/characters/${characterId}/missions/${missionId}/start`);
   },
   async complete(characterId: string, missionId: string): Promise<CompleteMissionResponse> {
-    return apiClient.post<CompleteMissionResponse>(`/characters/${characterId}/missions/${missionId}/complete`);
+    return apiClient.post<CompleteMissionResponse>(
+      `/characters/${characterId}/missions/${missionId}/complete`,
+    );
   },
 };

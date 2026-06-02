@@ -23,8 +23,10 @@ interface InventoryItemDto {
 
 export const inventoryService = {
   async list(characterId: string): Promise<{ items: InventoryItem[]; catalog: Item[] }> {
-    const invItems = await apiClient.get<InventoryItemDto[]>(`/characters/${characterId}/inventory`);
-    const catalogItems = invItems.map(i => ({
+    const invItems = await apiClient.get<InventoryItemDto[]>(
+      `/characters/${characterId}/inventory`,
+    );
+    const catalogItems = invItems.map((i) => ({
       id: i.itemId,
       name: i.name,
       type: i.type as Item["type"],
@@ -33,7 +35,7 @@ export const inventoryService = {
       price: 0,
       icon: i.icon,
     }));
-    const items: InventoryItem[] = invItems.map(i => ({
+    const items: InventoryItem[] = invItems.map((i) => ({
       itemId: i.itemId,
       quantity: i.quantity,
       equipped: i.equipped,

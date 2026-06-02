@@ -15,17 +15,38 @@ function VillagesPage() {
       service={adminVillageService}
       searchKeys={["name", "country"]}
       makeEmpty={() => ({
-        id: `v-${Date.now()}`, name: "Nova Vila", fullName: "", country: "",
-        description: "", symbol: "🍃", accentColor: "primary",
-        active: true, bonus: "", themeColor: "#3b82f6",
+        id: `v-${Date.now()}`,
+        name: "Nova Vila",
+        fullName: "",
+        country: "",
+        description: "",
+        symbol: "🍃",
+        accentColor: "primary",
+        active: true,
+        bonus: "",
+        themeColor: "#3b82f6",
       })}
       columns={[
         { key: "symbol", label: "" },
         { key: "name", label: "Nome" },
         { key: "country", label: "País" },
         { key: "bonus", label: "Bônus" },
-        { key: "themeColor", label: "Cor", render: (v) => <span className="inline-block h-4 w-8 rounded" style={{ background: v.themeColor }} /> },
-        { key: "active", label: "Status", render: (v) => <StatusPill tone={v.active ? "success" : "muted"}>{v.active ? "Ativo" : "Inativo"}</StatusPill> },
+        {
+          key: "themeColor",
+          label: "Cor",
+          render: (v) => (
+            <span className="inline-block h-4 w-8 rounded" style={{ background: v.themeColor }} />
+          ),
+        },
+        {
+          key: "active",
+          label: "Status",
+          render: (v) => (
+            <StatusPill tone={v.active ? "success" : "muted"}>
+              {v.active ? "Ativo" : "Inativo"}
+            </StatusPill>
+          ),
+        },
       ]}
       fields={[
         { name: "name", label: "Nome", type: "text" },

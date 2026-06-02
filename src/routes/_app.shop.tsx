@@ -19,10 +19,16 @@ function ShopPage() {
   const character = useGameStore((s) => s.character);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
-  const [history, setHistory] = useState<{ id: string; type: "buy"; name: string; price: number; date: string }[]>([]);
+  const [history, setHistory] = useState<
+    { id: string; type: "buy"; name: string; price: number; date: string }[]
+  >([]);
 
   useEffect(() => {
-    shopService.list().then(setItems).catch(() => setItems([])).finally(() => setLoading(false));
+    shopService
+      .list()
+      .then(setItems)
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
   }, []);
 
   async function buy(itemId: string, name: string, price: number) {
@@ -46,8 +52,11 @@ function ShopPage() {
 
   return (
     <div className="space-y-5">
-      <SectionTitle title="Loja" icon={<Store className="size-6 text-ryous" />}
-        description="Compre equipamentos." />
+      <SectionTitle
+        title="Loja"
+        icon={<Store className="size-6 text-ryous" />}
+        description="Compre equipamentos."
+      />
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {items.map((it) => (
@@ -56,13 +65,26 @@ function ShopPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-bold">{it.name}</h3>
-                    <div className="mt-0.5 flex items-center gap-2"><RarityBadge rarity={it.rarity} /><span className="text-[10px] capitalize text-muted-foreground">{it.type}</span></div>
+                    <div className="mt-0.5 flex items-center gap-2">
+                      <RarityBadge rarity={it.rarity} />
+                      <span className="text-[10px] capitalize text-muted-foreground">
+                        {it.type}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 text-sm font-bold text-ryous"><Coins className="size-3.5" /> {it.price}</div>
+                  <div className="flex items-center gap-1 text-sm font-bold text-ryous">
+                    <Coins className="size-3.5" /> {it.price}
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">{it.description}</p>
                 <div className="flex gap-2">
-                  <Button size="sm" className="flex-1" onClick={() => buy(it.id, it.name, it.price)}>Comprar</Button>
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => buy(it.id, it.name, it.price)}
+                  >
+                    Comprar
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -76,8 +98,13 @@ function ShopPage() {
             ) : (
               <div className="space-y-1.5">
                 {history.map((h) => (
-                  <div key={h.id} className="flex items-center justify-between rounded border bg-muted/30 px-2 py-1.5 text-xs">
-                    <span><span className="text-destructive">−</span> {h.name}</span>
+                  <div
+                    key={h.id}
+                    className="flex items-center justify-between rounded border bg-muted/30 px-2 py-1.5 text-xs"
+                  >
+                    <span>
+                      <span className="text-destructive">−</span> {h.name}
+                    </span>
                     <span className="font-semibold tabular-nums text-ryous">{h.price}</span>
                   </div>
                 ))}

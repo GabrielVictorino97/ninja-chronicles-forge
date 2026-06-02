@@ -2,7 +2,11 @@ import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
 export function StatCard({
-  label, value, icon: Icon, trend, accent = "primary",
+  label,
+  value,
+  icon: Icon,
+  trend,
+  accent = "primary",
 }: {
   label: string;
   value: string | number;
@@ -21,7 +25,12 @@ export function StatCard({
     <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-2 hover:border-primary/40 transition-colors">
       <div className="flex items-center justify-between">
         <span className="text-xs uppercase tracking-wide text-muted-foreground">{label}</span>
-        <div className={cn("h-9 w-9 rounded-lg bg-gradient-to-br grid place-items-center", tones[accent])}>
+        <div
+          className={cn(
+            "h-9 w-9 rounded-lg bg-gradient-to-br grid place-items-center",
+            tones[accent],
+          )}
+        >
           <Icon className="h-4 w-4" />
         </div>
       </div>

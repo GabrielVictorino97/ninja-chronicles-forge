@@ -26,23 +26,27 @@ function JutsusPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!character) { setLoading(false); return; }
-    Promise.all([
-      jutsuService.list(),
-      jutsuService.myJutsus(character.id),
-    ]).then(([all, mine]) => {
-      setAllJutsus(all);
-      setMyJutsus(mine);
-    }).catch(() => { setAllJutsus([]); setMyJutsus([]); }).finally(() => setLoading(false));
+    if (!character) {
+      setLoading(false);
+      return;
+    }
+    Promise.all([jutsuService.list(), jutsuService.myJutsus(character.id)])
+      .then(([all, mine]) => {
+        setAllJutsus(all);
+        setMyJutsus(mine);
+      })
+      .catch(() => {
+        setAllJutsus([]);
+        setMyJutsus([]);
+      })
+      .finally(() => setLoading(false));
   }, [character?.id]);
 
-  const learnedIds = new Set(myJutsus.map(j => j.id));
-  const equippedIds = new Set(myJutsus.filter(j => j.equipped).map(j => j.id));
+  const learnedIds = new Set(myJutsus.map((j) => j.id));
+  const equippedIds = new Set(myJutsus.filter((j) => j.equipped).map((j) => j.id));
 
   const equippedJutsus = allJutsus.filter((j) => equippedIds.has(j.id));
-  const knownNotEquipped = allJutsus.filter(
-    (j) => learnedIds.has(j.id) && !equippedIds.has(j.id),
-  );
+  const knownNotEquipped = allJutsus.filter((j) => learnedIds.has(j.id) && !equippedIds.has(j.id));
   const learnable = allJutsus.filter((j) => !learnedIds.has(j.id));
 
   async function learn(j: Jutsu) {
@@ -92,7 +96,12 @@ function JutsusPage() {
   }
 
   if (!character) return null;
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="size-8 animate-spin text-muted-foreground" /></div>;
+  if (loading)
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+      </div>
+    );
 
   return (
     <div className="space-y-5">
@@ -161,9 +170,7 @@ function JutsusPage() {
                   <Sparkles className="size-4 text-chakra" />
                   Aprendidos ({knownNotEquipped.length})
                 </h2>
-                <span className="text-[11px] text-muted-foreground">
-                  Pronto para equipar
-                </span>
+                <span className="text-[11px] text-muted-foreground">Pronto para equipar</span>
               </div>
               <div className="grid gap-2 md:grid-cols-2">
                 {knownNotEquipped.length === 0 && (
@@ -212,7 +219,11 @@ function JutsusPage() {
                           onClick={() => learn(j)}
                           disabled={locked}
                         >
-                          {locked ? <Lock className="size-3.5" /> : <BookOpen className="size-3.5" />}
+                          {locked ? (
+                            <Lock className="size-3.5" />
+                          ) : (
+                            <BookOpen className="size-3.5" />
+                          )}
                           {locked ? `Lv ${j.requirements.level}` : "Aprender"}
                         </Button>
                       }

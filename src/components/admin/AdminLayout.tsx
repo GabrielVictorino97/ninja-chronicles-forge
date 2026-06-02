@@ -1,7 +1,16 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Users, UserCircle, MapPin,
-  Swords, Trophy, Search, Bell, Menu, LogOut, Shield,
+  LayoutDashboard,
+  Users,
+  UserCircle,
+  MapPin,
+  Swords,
+  Trophy,
+  Search,
+  Bell,
+  Menu,
+  LogOut,
+  Shield,
 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -9,8 +18,12 @@ import { Button } from "@/components/ui/button";
 import { useAdminStore } from "@/store/adminStore";
 import { cn } from "@/lib/utils";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 const NAV = [
@@ -44,7 +57,8 @@ export function AdminLayout() {
         </div>
         <nav className="p-3 space-y-1 overflow-y-auto h-[calc(100vh-4rem)]">
           {NAV.map(({ to, label, icon: Icon }) => {
-            const active = pathname === to || (to !== "/admin/dashboard" && pathname.startsWith(to));
+            const active =
+              pathname === to || (to !== "/admin/dashboard" && pathname.startsWith(to));
             return (
               <Link
                 key={to}
@@ -67,7 +81,12 @@ export function AdminLayout() {
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 border-b border-border bg-card/60 backdrop-blur sticky top-0 z-30 flex items-center gap-3 px-4 md:px-6">
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen((v) => !v)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setOpen((v) => !v)}
+          >
             <Menu className="h-5 w-5" />
           </Button>
           <div className="relative flex-1 max-w-xl">

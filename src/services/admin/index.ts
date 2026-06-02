@@ -1,9 +1,19 @@
 import { apiClient } from "@/lib/api";
 import type {
-  AdminUser, AdminCharacter, AdminVillage, AdminBloodlineClan,
-  AdminBattle, AdminAuditLog, BalanceSettings, AdminRole,
-  AdminMission, AdminJutsu, AdminItem, AdminEvent,
-  AdminDashboardData, RankingEntry,
+  AdminUser,
+  AdminCharacter,
+  AdminVillage,
+  AdminBloodlineClan,
+  AdminBattle,
+  AdminAuditLog,
+  BalanceSettings,
+  AdminRole,
+  AdminMission,
+  AdminJutsu,
+  AdminItem,
+  AdminEvent,
+  AdminDashboardData,
+  RankingEntry,
 } from "@/types/admin";
 
 interface DashboardDto {
@@ -60,14 +70,13 @@ export const adminUserService = {
   },
   get: async (id: string): Promise<AdminUser | null> => {
     const users = await apiClient.get<AdminUserDto[]>("/admin/users");
-    const u = users.find(u => u.id === id);
+    const u = users.find((u) => u.id === id);
     return u ? mapUser(u) : null;
   },
   ban: (id: string) => apiClient.post(`/admin/users/${id}/ban`),
   unban: (id: string) => apiClient.post(`/admin/users/${id}/unban`),
   block: (id: string) => apiClient.post(`/admin/users/${id}/ban`),
-  setRole: (id: string, role: AdminRole) =>
-    apiClient.put(`/admin/users/${id}/role`, { role }),
+  setRole: (id: string, role: AdminRole) => apiClient.put(`/admin/users/${id}/role`, { role }),
 };
 
 export const adminCharacterService = {

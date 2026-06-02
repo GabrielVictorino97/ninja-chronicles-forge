@@ -1,13 +1,52 @@
 import type {
-  AdminUser, AdminCharacter, AdminVillage, AdminBloodlineClan,
-  AdminMission, AdminJutsu, AdminItem, AdminEvent, AdminBattle,
-  AdminAuditLog, BalanceSettings, AdminDashboardData, RankingEntry,
+  AdminUser,
+  AdminCharacter,
+  AdminVillage,
+  AdminBloodlineClan,
+  AdminMission,
+  AdminJutsu,
+  AdminItem,
+  AdminEvent,
+  AdminBattle,
+  AdminAuditLog,
+  BalanceSettings,
+  AdminDashboardData,
+  RankingEntry,
 } from "@/types/admin";
 import { mockVillages } from "./villages";
 import { mockBloodlineClans } from "./clans";
 
-const NAMES = ["Kazumi", "Ryuji", "Hikari", "Daichi", "Aiko", "Hideo", "Sakura", "Naoki", "Yuki", "Ren", "Mei", "Takeshi", "Asuka", "Kenji", "Mio", "Sora", "Hana", "Kaito", "Rina", "Shou"];
-const GRADUATIONS = ["Estudante", "Genin", "Chunin", "Tokubetsu Jounin", "Jounin", "ANBU", "Kage"] as const;
+const NAMES = [
+  "Kazumi",
+  "Ryuji",
+  "Hikari",
+  "Daichi",
+  "Aiko",
+  "Hideo",
+  "Sakura",
+  "Naoki",
+  "Yuki",
+  "Ren",
+  "Mei",
+  "Takeshi",
+  "Asuka",
+  "Kenji",
+  "Mio",
+  "Sora",
+  "Hana",
+  "Kaito",
+  "Rina",
+  "Shou",
+];
+const GRADUATIONS = [
+  "Estudante",
+  "Genin",
+  "Chunin",
+  "Tokubetsu Jounin",
+  "Jounin",
+  "ANBU",
+  "Kage",
+] as const;
 const ELEMENTS = ["Katon", "Suiton", "Doton", "Fuuton", "Raiton"] as const;
 
 const rand = (n: number) => Math.floor(Math.random() * n);
@@ -36,22 +75,35 @@ export const mockAdminCharacters: AdminCharacter[] = mockAdminUsers.slice(0, 24)
   userName: u.name,
   villageId: mockVillages[i % mockVillages.length].id,
   clanId: mockBloodlineClans[i % mockBloodlineClans.length].id,
-  level: 5 + (i * 3) % 60,
+  level: 5 + ((i * 3) % 60),
   graduation: GRADUATIONS[i % GRADUATIONS.length],
   power: 1500 + i * 312,
   ryous: 500 + i * 187,
   status: i % 9 === 0 ? "blocked" : "active",
   attributes: {
-    taijutsu: 20 + rand(40), ninjutsu: 20 + rand(40), genjutsu: 10 + rand(30),
-    intelligence: 15 + rand(30), vitality: 25 + rand(40), chakra: 25 + rand(40),
-    agility: 20 + rand(35), luck: 5 + rand(25),
+    taijutsu: 20 + rand(40),
+    ninjutsu: 20 + rand(40),
+    genjutsu: 10 + rand(30),
+    intelligence: 15 + rand(30),
+    vitality: 25 + rand(40),
+    chakra: 25 + rand(40),
+    agility: 20 + rand(35),
+    luck: 5 + rand(25),
   },
 }));
 
 export const mockAdminVillages: AdminVillage[] = mockVillages.map((v, i) => ({
   ...v,
   active: true,
-  bonus: ["+5% XP", "+5% Drop", "+10% Defesa", "+10% Crítico", "+5% Ataque", "+8% Esquiva", "+10% Chakra"][i],
+  bonus: [
+    "+5% XP",
+    "+5% Drop",
+    "+10% Defesa",
+    "+10% Crítico",
+    "+5% Ataque",
+    "+8% Esquiva",
+    "+10% Chakra",
+  ][i],
   themeColor: ["#ef4444", "#eab308", "#3b82f6", "#a855f7", "#92400e", "#0ea5e9", "#7c3aed"][i],
 }));
 
@@ -61,13 +113,45 @@ export const mockAdminBloodlineClans: AdminBloodlineClan[] = mockBloodlineClans.
   villageId: mockVillages[i % mockVillages.length].id,
   description: c.description,
   passiveBonus: c.bonus,
-  kekkeiGenkai: ["Sharingan", "Byakugan", "Chakra Vital", "Mokuton", "Kageyose", "Baika", "Shintenshin", "Mushi", "Inu", "Enkō", "Shikotsumyaku", "Suika", "Hakkō", "Sajin"][i] || "Nenhum",
+  kekkeiGenkai:
+    [
+      "Sharingan",
+      "Byakugan",
+      "Chakra Vital",
+      "Mokuton",
+      "Kageyose",
+      "Baika",
+      "Shintenshin",
+      "Mushi",
+      "Inu",
+      "Enkō",
+      "Shikotsumyaku",
+      "Suika",
+      "Hakkō",
+      "Sajin",
+    ][i] || "Nenhum",
   active: true,
   exclusiveJutsus: [`${c.name} Secret Art I`, `${c.name} Secret Art II`],
 }));
 
 const RANKS = ["D", "C", "B", "A", "S"] as const;
-const MTYPES = ["Entrega", "Patrulha", "Escolta", "Investigação", "Captura", "Defesa da vila", "Assassinato", "Infiltração", "Resgate", "Treinamento", "Boss", "História", "Diária", "Semanal", "Clã"] as const;
+const MTYPES = [
+  "Entrega",
+  "Patrulha",
+  "Escolta",
+  "Investigação",
+  "Captura",
+  "Defesa da vila",
+  "Assassinato",
+  "Infiltração",
+  "Resgate",
+  "Treinamento",
+  "Boss",
+  "História",
+  "Diária",
+  "Semanal",
+  "Clã",
+] as const;
 
 export const mockAdminMissions: AdminMission[] = Array.from({ length: 22 }, (_, i) => ({
   id: `m-${i + 1}`,
@@ -87,8 +171,26 @@ export const mockAdminMissions: AdminMission[] = Array.from({ length: 22 }, (_, 
   active: i % 7 !== 0,
 }));
 
-const JTYPES = ["Taijutsu", "Ninjutsu", "Genjutsu", "Fuinjutsu", "Iryo Ninjutsu", "Senjutsu", "Doujutsu", "Kinjutsu", "Kuchiyose", "Kekkei Genkai"] as const;
-const ATTR_KEYS = ["taijutsu", "ninjutsu", "genjutsu", "intelligence", "chakra", "agility"] as const;
+const JTYPES = [
+  "Taijutsu",
+  "Ninjutsu",
+  "Genjutsu",
+  "Fuinjutsu",
+  "Iryo Ninjutsu",
+  "Senjutsu",
+  "Doujutsu",
+  "Kinjutsu",
+  "Kuchiyose",
+  "Kekkei Genkai",
+] as const;
+const ATTR_KEYS = [
+  "taijutsu",
+  "ninjutsu",
+  "genjutsu",
+  "intelligence",
+  "chakra",
+  "agility",
+] as const;
 
 export const mockAdminJutsus: AdminJutsu[] = Array.from({ length: 24 }, (_, i) => ({
   id: `j-${i + 1}`,
@@ -100,9 +202,9 @@ export const mockAdminJutsus: AdminJutsu[] = Array.from({ length: 24 }, (_, i) =
   cooldown: 1 + (i % 6),
   baseDamage: 20 + i * 6,
   scalesWith: ATTR_KEYS[i % ATTR_KEYS.length],
-  precision: 70 + (i * 3) % 30,
-  critChance: 5 + (i * 2) % 20,
-  minLevel: 1 + (i * 2) % 50,
+  precision: 70 + ((i * 3) % 30),
+  critChance: 5 + ((i * 2) % 20),
+  minLevel: 1 + ((i * 2) % 50),
   minGraduation: GRADUATIONS[i % GRADUATIONS.length],
   clanRequirement: i % 5 === 0 ? mockBloodlineClans[i % mockBloodlineClans.length].name : undefined,
   elementRequirement: i % 4 === 0 ? ELEMENTS[i % ELEMENTS.length] : undefined,
@@ -111,7 +213,16 @@ export const mockAdminJutsus: AdminJutsu[] = Array.from({ length: 24 }, (_, i) =
   active: i % 11 !== 0,
 }));
 
-const ITYPES = ["Arma", "Armadura", "Acessório", "Ferramenta Ninja", "Consumível", "Pergaminho", "Material", "Evento"] as const;
+const ITYPES = [
+  "Arma",
+  "Armadura",
+  "Acessório",
+  "Ferramenta Ninja",
+  "Consumível",
+  "Pergaminho",
+  "Material",
+  "Evento",
+] as const;
 const RARITIES = ["Comum", "Incomum", "Raro", "Épico", "Lendário", "Mítico"] as const;
 
 export const mockAdminItems: AdminItem[] = Array.from({ length: 26 }, (_, i) => ({
@@ -124,13 +235,23 @@ export const mockAdminItems: AdminItem[] = Array.from({ length: 26 }, (_, i) => 
   sellable: i % 8 !== 0,
   equippable: i % 3 === 0,
   consumable: i % 5 === 0,
-  minLevel: 1 + (i * 2) % 40,
+  minLevel: 1 + ((i * 2) % 40),
   minGraduation: GRADUATIONS[i % GRADUATIONS.length],
   attributeBonus: { taijutsu: i % 5, vitality: i % 4 },
   active: i % 13 !== 0,
 }));
 
-const EVENT_NAMES = ["Invasão da Akatsuki", "Exame Chunin", "Guerra Ninja", "Ataque da Kurama", "Boss Orochimaru", "Boss Pain", "Torneio dos Cinco Kages", "XP Dobrado", "Drop Aumentado"];
+const EVENT_NAMES = [
+  "Invasão da Akatsuki",
+  "Exame Chunin",
+  "Guerra Ninja",
+  "Ataque da Kurama",
+  "Boss Orochimaru",
+  "Boss Pain",
+  "Torneio dos Cinco Kages",
+  "XP Dobrado",
+  "Drop Aumentado",
+];
 const ETYPES = ["Invasão", "Torneio", "Boss", "Bônus", "História"] as const;
 
 export const mockAdminEvents: AdminEvent[] = EVENT_NAMES.map((name, i) => ({
@@ -152,8 +273,9 @@ export const mockAdminBattles: AdminBattle[] = Array.from({ length: 30 }, (_, i)
   player1: `${NAMES[i % NAMES.length]}${i}`,
   player2: i % 3 === 0 ? `Bandido ${i}` : `${NAMES[(i + 5) % NAMES.length]}${i + 1}`,
   type: (["PvP", "PvE", "Boss", "Arena"] as const)[i % 4],
-  winner: i % 2 === 0 ? `${NAMES[i % NAMES.length]}${i}` : `${NAMES[(i + 5) % NAMES.length]}${i + 1}`,
-  duration: `${1 + i % 10}m ${10 + i * 3 % 50}s`,
+  winner:
+    i % 2 === 0 ? `${NAMES[i % NAMES.length]}${i}` : `${NAMES[(i + 5) % NAMES.length]}${i + 1}`,
+  duration: `${1 + (i % 10)}m ${10 + ((i * 3) % 50)}s`,
   date: dateAgo(i % 14),
   status: i % 17 === 0 ? "abandoned" : "completed",
   turns: Array.from({ length: 6 }, (_, t) => ({
@@ -209,16 +331,21 @@ export const mockAdminDashboard: AdminDashboardData = {
   })),
   missionsByRank: RANKS.map((r, i) => ({ rank: r, value: 600 - i * 110 })),
   villagesDistribution: mockVillages.map((v, i) => ({ name: v.name, value: 800 - i * 90 })),
-  clansDistribution: mockBloodlineClans.slice(0, 8).map((c, i) => ({ name: c.name, value: 400 - i * 35 })),
+  clansDistribution: mockBloodlineClans
+    .slice(0, 8)
+    .map((c, i) => ({ name: c.name, value: 400 - i * 35 })),
 };
 
-export const mockAdminRankings: RankingEntry[] = mockAdminCharacters.map((c, i) => ({
-  position: i + 1,
-  name: c.name,
-  village: mockVillages.find((v) => v.id === c.villageId)?.name || "—",
-  clan: mockBloodlineClans.find((b) => b.id === c.clanId)?.name || "—",
-  level: c.level,
-  power: c.power,
-  wins: 50 + i * 4,
-  losses: 10 + i,
-})).sort((a, b) => b.power - a.power).map((r, i) => ({ ...r, position: i + 1 }));
+export const mockAdminRankings: RankingEntry[] = mockAdminCharacters
+  .map((c, i) => ({
+    position: i + 1,
+    name: c.name,
+    village: mockVillages.find((v) => v.id === c.villageId)?.name || "—",
+    clan: mockBloodlineClans.find((b) => b.id === c.clanId)?.name || "—",
+    level: c.level,
+    power: c.power,
+    wins: 50 + i * 4,
+    losses: 10 + i,
+  }))
+  .sort((a, b) => b.power - a.power)
+  .map((r, i) => ({ ...r, position: i + 1 }));

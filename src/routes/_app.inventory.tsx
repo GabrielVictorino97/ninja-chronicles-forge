@@ -16,13 +16,20 @@ export const Route = createFileRoute("/_app/inventory")({
 });
 
 const TYPES: { id: ItemType | "all"; label: string }[] = [
-  { id: "all", label: "Todos" }, { id: "weapon", label: "Armas" }, { id: "armor", label: "Armaduras" },
-  { id: "accessory", label: "Acessórios" }, { id: "tool", label: "Ferramentas" }, { id: "consumable", label: "Consumíveis" },
+  { id: "all", label: "Todos" },
+  { id: "weapon", label: "Armas" },
+  { id: "armor", label: "Armaduras" },
+  { id: "accessory", label: "Acessórios" },
+  { id: "tool", label: "Ferramentas" },
+  { id: "consumable", label: "Consumíveis" },
 ];
 const SLOTS: { id: EquipSlot; label: string }[] = [
-  { id: "weapon", label: "Arma" }, { id: "armor", label: "Armadura" },
-  { id: "accessory1", label: "Acessório 1" }, { id: "accessory2", label: "Acessório 2" },
-  { id: "tool", label: "Ferramenta" }, { id: "summon", label: "Invocação" },
+  { id: "weapon", label: "Arma" },
+  { id: "armor", label: "Armadura" },
+  { id: "accessory1", label: "Acessório 1" },
+  { id: "accessory2", label: "Acessório 2" },
+  { id: "tool", label: "Ferramenta" },
+  { id: "summon", label: "Invocação" },
 ];
 
 function InventoryPage() {
@@ -33,17 +40,37 @@ function InventoryPage() {
   const [filter, setFilter] = useState<ItemType | "all">("all");
 
   useEffect(() => {
-    if (!character) { setLoading(false); return; }
-    inventoryService.list(character.id).then(({ items, catalog: cat }) => {
-      setInvItems(items);
-      setCatalog(cat);
-    }).catch(() => { setInvItems([]); setCatalog([]); }).finally(() => setLoading(false));
+    if (!character) {
+      setLoading(false);
+      return;
+    }
+    inventoryService
+      .list(character.id)
+      .then(({ items, catalog: cat }) => {
+        setInvItems(items);
+        setCatalog(cat);
+      })
+      .catch(() => {
+        setInvItems([]);
+        setCatalog([]);
+      })
+      .finally(() => setLoading(false));
   }, [character?.id]);
 
-  const merged = invItems.map((inv) => ({
-    ...inv,
-    item: catalog.find((i) => i.id === inv.itemId) ?? { id: inv.itemId, name: "Desconhecido", type: "consumable" as ItemType, rarity: "common" as const, description: "", price: 0, icon: "" },
-  })).filter((x) => filter === "all" || x.item.type === filter);
+  const merged = invItems
+    .map((inv) => ({
+      ...inv,
+      item: catalog.find((i) => i.id === inv.itemId) ?? {
+        id: inv.itemId,
+        name: "Desconhecido",
+        type: "consumable" as ItemType,
+        rarity: "common" as const,
+        description: "",
+        price: 0,
+        icon: "",
+      },
+    }))
+    .filter((x) => filter === "all" || x.item.type === filter);
 
   async function handleEquip(itemId: string) {
     if (!character) return;
@@ -56,12 +83,20 @@ function InventoryPage() {
   }
 
   if (!character) return null;
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="size-8 animate-spin text-muted-foreground" /></div>;
+  if (loading)
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+      </div>
+    );
 
   return (
     <div className="space-y-5">
-      <SectionTitle title="Inventário" icon={<Backpack className="size-6 text-primary" />}
-        description="Equipamentos e itens do seu shinobi." />
+      <SectionTitle
+        title="Inventário"
+        icon={<Backpack className="size-6 text-primary" />}
+        description="Equipamentos e itens do seu shinobi."
+      />
 
       <Card className="shadow-card">
         <CardContent className="grid grid-cols-2 gap-2 p-4 sm:grid-cols-3 lg:grid-cols-6">
@@ -80,14 +115,21 @@ function InventoryPage() {
 
       <div className="flex flex-wrap gap-2">
         {TYPES.map((t) => (
-          <Button key={t.id} size="sm" variant={filter === t.id ? "default" : "outline"} onClick={() => setFilter(t.id)}>
+          <Button
+            key={t.id}
+            size="sm"
+            variant={filter === t.id ? "default" : "outline"}
+            onClick={() => setFilter(t.id)}
+          >
             {t.label}
           </Button>
         ))}
       </div>
 
       {merged.length === 0 ? (
-        <div className="rounded-xl border border-dashed py-12 text-center text-muted-foreground">Nenhum item neste filtro.</div>
+        <div className="rounded-xl border border-dashed py-12 text-center text-muted-foreground">
+          Nenhum item neste filtro.
+        </div>
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {merged.map((x) => (
@@ -96,13 +138,27 @@ function InventoryPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-bold">{x.item.name}</h3>
-                    <div className="mt-0.5 flex items-center gap-2"><RarityBadge rarity={x.item.rarity} /><span className="text-[10px] text-muted-foreground capitalize">{x.item.type}</span></div>
+                    <div className="mt-0.5 flex items-center gap-2">
+                      <RarityBadge rarity={x.item.rarity} />
+                      <span className="text-[10px] text-muted-foreground capitalize">
+                        {x.item.type}
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-xs font-bold tabular-nums">{x.equipped ? "Eq" : `x${x.quantity}`}</span>
+                  <span className="text-xs font-bold tabular-nums">
+                    {x.equipped ? "Eq" : `x${x.quantity}`}
+                  </span>
                 </div>
                 <p className="text-xs text-muted-foreground">{x.item.description}</p>
                 <div className="flex gap-2">
-                  <Button size="sm" className="flex-1" disabled={x.equipped} onClick={() => handleEquip(x.itemId)}>Equipar</Button>
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    disabled={x.equipped}
+                    onClick={() => handleEquip(x.itemId)}
+                  >
+                    Equipar
+                  </Button>
                 </div>
               </CardContent>
             </Card>

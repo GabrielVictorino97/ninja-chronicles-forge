@@ -10,12 +10,21 @@ const map: Record<ItemRarity, string> = {
 };
 
 const labels: Record<ItemRarity, string> = {
-  common: "Comum", uncommon: "Incomum", rare: "Rara", epic: "Épica", legendary: "Lendária",
+  common: "Comum",
+  uncommon: "Incomum",
+  rare: "Rara",
+  epic: "Épica",
+  legendary: "Lendária",
 };
 
 export function RarityBadge({ rarity }: { rarity: ItemRarity }) {
   return (
-    <span className={cn("inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide", map[rarity])}>
+    <span
+      className={cn(
+        "inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+        map[rarity],
+      )}
+    >
       {labels[rarity]}
     </span>
   );

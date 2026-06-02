@@ -5,8 +5,16 @@ import { StatCard } from "@/components/admin/StatCard";
 import { BarChart, ChartCard, DonutChart, LineChart } from "@/components/admin/MiniChart";
 import { PageHeader } from "@/components/admin/DataTable";
 import {
-  Users, UserCheck, UserCircle, Swords, Scroll, Dna,
-  CalendarRange, AlertTriangle, Ban, CreditCard,
+  Users,
+  UserCheck,
+  UserCircle,
+  Swords,
+  Scroll,
+  Dna,
+  CalendarRange,
+  AlertTriangle,
+  Ban,
+  CreditCard,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/dashboard")({
@@ -25,14 +33,40 @@ function DashboardPage() {
     <div className="space-y-6">
       <PageHeader title="Dashboard" description="Visão geral do servidor de jogo." />
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
-        <StatCard label="Usuários" value={data.totalUsers.toLocaleString()} icon={Users} accent="primary" trend="+12% no mês" />
-        <StatCard label="Ativos agora" value={data.activeUsers.toLocaleString()} icon={UserCheck} accent="success" />
-        <StatCard label="Personagens" value={data.charactersCreated.toLocaleString()} icon={UserCircle} accent="info" />
+        <StatCard
+          label="Usuários"
+          value={data.totalUsers.toLocaleString()}
+          icon={Users}
+          accent="primary"
+          trend="+12% no mês"
+        />
+        <StatCard
+          label="Ativos agora"
+          value={data.activeUsers.toLocaleString()}
+          icon={UserCheck}
+          accent="success"
+        />
+        <StatCard
+          label="Personagens"
+          value={data.charactersCreated.toLocaleString()}
+          icon={UserCircle}
+          accent="info"
+        />
         <StatCard label="Batalhas hoje" value={data.battlesToday} icon={Swords} accent="warning" />
         <StatCard label="Missões hoje" value={data.missionsToday} icon={Scroll} accent="primary" />
         <StatCard label="Clãs ativos" value={data.activeClans} icon={Dna} accent="info" />
-        <StatCard label="Eventos ativos" value={data.activeEvents} icon={CalendarRange} accent="success" />
-        <StatCard label="Denúncias" value={data.pendingReports} icon={AlertTriangle} accent="warning" />
+        <StatCard
+          label="Eventos ativos"
+          value={data.activeEvents}
+          icon={CalendarRange}
+          accent="success"
+        />
+        <StatCard
+          label="Denúncias"
+          value={data.pendingReports}
+          icon={AlertTriangle}
+          accent="warning"
+        />
         <StatCard label="Banidos" value={data.bannedUsers} icon={Ban} accent="destructive" />
         <StatCard label="Transações" value={data.transactions} icon={CreditCard} accent="info" />
       </div>

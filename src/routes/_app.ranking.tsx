@@ -15,20 +15,33 @@ export const Route = createFileRoute("/_app/ranking")({
 const TABS = ["Jogadores", "Clãs", "Arena", "Missões", "Poder total"] as const;
 
 function RankingPage() {
-  const [tab, setTab] = useState<typeof TABS[number]>("Jogadores");
+  const [tab, setTab] = useState<(typeof TABS)[number]>("Jogadores");
   const [ranking, setRanking] = useState<RankingPlayer[] | null>(null);
 
   useEffect(() => {
-    rankingService.list().then(setRanking).catch(() => setRanking([]));
+    rankingService
+      .list()
+      .then(setRanking)
+      .catch(() => setRanking([]));
   }, []);
 
   return (
     <div className="space-y-5">
-      <SectionTitle title="Ranking" icon={<Trophy className="size-6 text-primary" />}
-        description="Os shinobis mais poderosos do mundo." />
+      <SectionTitle
+        title="Ranking"
+        icon={<Trophy className="size-6 text-primary" />}
+        description="Os shinobis mais poderosos do mundo."
+      />
       <div className="flex flex-wrap gap-2">
         {TABS.map((t) => (
-          <Button key={t} size="sm" variant={tab === t ? "default" : "outline"} onClick={() => setTab(t)}>{t}</Button>
+          <Button
+            key={t}
+            size="sm"
+            variant={tab === t ? "default" : "outline"}
+            onClick={() => setTab(t)}
+          >
+            {t}
+          </Button>
         ))}
       </div>
       <Card className="shadow-card">
@@ -38,7 +51,9 @@ function RankingPage() {
               <Loader2 className="size-6 animate-spin" />
             </div>
           ) : ranking.length === 0 ? (
-            <div className="rounded-xl py-12 text-center text-muted-foreground">Nenhum jogador no ranking.</div>
+            <div className="rounded-xl py-12 text-center text-muted-foreground">
+              Nenhum jogador no ranking.
+            </div>
           ) : (
             <div className="scroll-thin overflow-x-auto">
               <table className="w-full text-sm">
@@ -63,7 +78,9 @@ function RankingPage() {
                       <td className="px-3 py-2 text-muted-foreground">{p.clan}</td>
                       <td className="px-3 py-2 text-right tabular-nums">{p.level}</td>
                       <td className="px-3 py-2 text-xs">{p.graduation}</td>
-                      <td className="px-3 py-2 text-right font-bold tabular-nums">{p.power.toLocaleString()}</td>
+                      <td className="px-3 py-2 text-right font-bold tabular-nums">
+                        {p.power.toLocaleString()}
+                      </td>
                       <td className="px-3 py-2 text-right tabular-nums text-xp">{p.wins}</td>
                     </tr>
                   ))}

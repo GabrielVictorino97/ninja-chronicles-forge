@@ -26,7 +26,9 @@ function SelectCharacterPage() {
   const logout = useGameStore((s) => s.logout);
   const user = useGameStore((s) => s.user);
 
-  const [list, setList] = useState<Character[] | null>(charactersInStore.length ? charactersInStore : null);
+  const [list, setList] = useState<Character[] | null>(
+    charactersInStore.length ? charactersInStore : null,
+  );
   const [loading, setLoading] = useState(!charactersInStore.length);
   const [selectingId, setSelectingId] = useState<string | null>(null);
 
@@ -35,10 +37,24 @@ function SelectCharacterPage() {
     setLoading(true);
     characterService
       .list()
-      .then((cs) => { if (!cancelled) { setList(cs); setCharacters(cs); } })
-      .catch((e) => { if (!cancelled) { toast.error(e instanceof Error ? e.message : "Falha ao carregar personagens"); setList([]); } })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+      .then((cs) => {
+        if (!cancelled) {
+          setList(cs);
+          setCharacters(cs);
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          toast.error(e instanceof Error ? e.message : "Falha ao carregar personagens");
+          setList([]);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [setCharacters]);
 
   async function select(c: Character) {
@@ -66,10 +82,18 @@ function SelectCharacterPage() {
           <div>
             <h1 className="text-3xl font-black text-gradient-primary">Escolha seu Shinobi</h1>
             <p className="text-sm text-muted-foreground">
-              {user?.name ? `Bem-vindo, ${user.name}.` : "Bem-vindo."} Selecione um personagem para entrar no mundo.
+              {user?.name ? `Bem-vindo, ${user.name}.` : "Bem-vindo."} Selecione um personagem para
+              entrar no mundo.
             </p>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => { logout(); navigate({ to: "/login" }); }}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              logout();
+              navigate({ to: "/login" });
+            }}
+          >
             <LogOut className="size-4" /> Sair
           </Button>
         </div>
@@ -105,11 +129,15 @@ function SelectCharacterPage() {
                   <CardContent className="space-y-2 text-xs">
                     <div className="flex items-center justify-between text-muted-foreground">
                       <span>HP</span>
-                      <span className="tabular-nums">{c.hp}/{c.hpMax}</span>
+                      <span className="tabular-nums">
+                        {c.hp}/{c.hpMax}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-muted-foreground">
                       <span>Chakra</span>
-                      <span className="tabular-nums">{c.chakra}/{c.chakraMax}</span>
+                      <span className="tabular-nums">
+                        {c.chakra}/{c.chakraMax}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-muted-foreground">
                       <span>Ryous</span>
@@ -117,15 +145,24 @@ function SelectCharacterPage() {
                     </div>
                     <div className="flex items-center justify-between text-muted-foreground">
                       <span>Poder</span>
-                      <span className="tabular-nums text-primary">{c.power.toLocaleString("pt-BR")}</span>
+                      <span className="tabular-nums text-primary">
+                        {c.power.toLocaleString("pt-BR")}
+                      </span>
                     </div>
                     <Button
                       className="mt-3 w-full"
                       size="sm"
                       disabled={!!selectingId}
-                      onClick={(e) => { e.stopPropagation(); select(c); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        select(c);
+                      }}
                     >
-                      {isSelecting ? <Loader2 className="size-4 animate-spin" /> : <Sword className="size-4" />}
+                      {isSelecting ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Sword className="size-4" />
+                      )}
                       Jogar
                     </Button>
                   </CardContent>

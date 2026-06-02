@@ -37,7 +37,9 @@ function HuntPage() {
     }
   }
 
-  useEffect(() => { refresh(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [character?.id]);
+  useEffect(() => {
+    refresh(); /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [character?.id]);
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
@@ -62,7 +64,9 @@ function HuntPage() {
       await refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao iniciar caçada");
-    } finally { setBusy(false); }
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function complete() {
@@ -79,7 +83,9 @@ function HuntPage() {
       await refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao concluir caçada");
-    } finally { setBusy(false); }
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -104,12 +110,22 @@ function HuntPage() {
                   <div className="text-2xl font-bold tabular-nums">
                     {Math.floor(remaining / 60)}min {(remaining % 60).toString().padStart(2, "0")}s
                   </div>
-                  <div className="text-xs text-muted-foreground">Nível da caçada: {status.huntLevel}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Nível da caçada: {status.huntLevel}
+                  </div>
                 </div>
                 <StatBar value={Math.floor(elapsedPct)} max={100} tone="xp" showValue={false} />
                 <div className="grid grid-cols-2 gap-3 pt-2 text-sm">
-                  <Reward icon={<Star className="size-4 text-xp" />} label="XP" value={status.xpReward} />
-                  <Reward icon={<Coins className="size-4 text-ryous" />} label="Ryous" value={status.ryousReward} />
+                  <Reward
+                    icon={<Star className="size-4 text-xp" />}
+                    label="XP"
+                    value={status.xpReward}
+                  />
+                  <Reward
+                    icon={<Coins className="size-4 text-ryous" />}
+                    label="Ryous"
+                    value={status.ryousReward}
+                  />
                 </div>
                 <Button disabled className="w-full">
                   <Timer className="size-4" /> Aguardando término
@@ -120,8 +136,16 @@ function HuntPage() {
                 <div className="text-sm uppercase text-muted-foreground">Caçada concluída</div>
                 <div className="text-base">Sua caçada terminou. Resgate as recompensas!</div>
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <Reward icon={<Star className="size-4 text-xp" />} label="XP" value={status.xpReward} />
-                  <Reward icon={<Coins className="size-4 text-ryous" />} label="Ryous" value={status.ryousReward} />
+                  <Reward
+                    icon={<Star className="size-4 text-xp" />}
+                    label="XP"
+                    value={status.xpReward}
+                  />
+                  <Reward
+                    icon={<Coins className="size-4 text-ryous" />}
+                    label="Ryous"
+                    value={status.ryousReward}
+                  />
                 </div>
                 <Button onClick={complete} disabled={busy} className="w-full">
                   Resgatar recompensas
@@ -151,7 +175,11 @@ function HuntPage() {
                         </Button>
                       ))}
                     </div>
-                    <Button onClick={start} disabled={busy || character.energy < 10} className="w-full">
+                    <Button
+                      onClick={start}
+                      disabled={busy || character.energy < 10}
+                      className="w-full"
+                    >
                       <Crosshair className="size-4" /> Iniciar caçada
                     </Button>
                   </>
@@ -165,8 +193,14 @@ function HuntPage() {
           <CardContent className="space-y-3 p-5 text-sm">
             <div className="text-xs uppercase text-muted-foreground">Resumo do dia</div>
             <Row label="Caçadas usadas" value={status ? `${status.todayHuntsUsed}/10` : "—"} />
-            <Row label="Caçadas restantes" value={status ? String(status.todayHuntsRemaining) : "—"} />
-            <Row label="Tempo disponível hoje" value={status ? `${status.totalAvailableMinutes} min` : "—"} />
+            <Row
+              label="Caçadas restantes"
+              value={status ? String(status.todayHuntsRemaining) : "—"}
+            />
+            <Row
+              label="Tempo disponível hoje"
+              value={status ? `${status.totalAvailableMinutes} min` : "—"}
+            />
             <div className="pt-3 text-xs text-muted-foreground">
               Bônus: 5min +50%, 10min +30%, 15min +15%, 20min +5%.
             </div>

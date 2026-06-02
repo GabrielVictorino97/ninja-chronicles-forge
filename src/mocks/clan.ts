@@ -16,7 +16,12 @@ export const mockPlayerClan: PlayerClan = {
     { characterId: "c5", name: "Sora", level: 8, role: "Recruta", donations: 80 },
   ],
   wall: [
-    { id: "w1", author: "Tenma", message: "Treinamento amanhã às 20h, todos presentes!", date: "1h" },
+    {
+      id: "w1",
+      author: "Tenma",
+      message: "Treinamento amanhã às 20h, todos presentes!",
+      date: "1h",
+    },
     { id: "w2", author: "Rumi", message: "Doei 500 ryous, vamos subir o clã 💪", date: "5h" },
     { id: "w3", author: "Kazumi", message: "Voltei da missão A com sucesso!", date: "ontem" },
   ],

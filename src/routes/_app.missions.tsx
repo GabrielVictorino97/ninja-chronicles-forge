@@ -26,7 +26,11 @@ function MissionsPage() {
   const setCharacter = useGameStore((s) => s.setCharacter);
 
   useEffect(() => {
-    missionService.list().then(setMissions).catch(() => setMissions([])).finally(() => setLoading(false));
+    missionService
+      .list()
+      .then(setMissions)
+      .catch(() => setMissions([]))
+      .finally(() => setLoading(false));
   }, []);
 
   const list = missions.filter((m) => filter === "ALL" || m.rank === filter);
@@ -56,19 +60,36 @@ function MissionsPage() {
     }
   }
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="size-8 animate-spin text-muted-foreground" /></div>;
+  if (loading)
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+      </div>
+    );
 
   return (
     <div className="space-y-5">
-      <SectionTitle title="Missões" icon={<ScrollText className="size-6 text-primary" />}
-        description="Aceite contratos para ganhar XP, ryous e itens." />
+      <SectionTitle
+        title="Missões"
+        icon={<ScrollText className="size-6 text-primary" />}
+        description="Aceite contratos para ganhar XP, ryous e itens."
+      />
 
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant={filter === "ALL" ? "default" : "outline"} onClick={() => setFilter("ALL")}>
+        <Button
+          size="sm"
+          variant={filter === "ALL" ? "default" : "outline"}
+          onClick={() => setFilter("ALL")}
+        >
           Todas
         </Button>
         {RANKS.map((r) => (
-          <Button key={r} size="sm" variant={filter === r ? "default" : "outline"} onClick={() => setFilter(r)}>
+          <Button
+            key={r}
+            size="sm"
+            variant={filter === r ? "default" : "outline"}
+            onClick={() => setFilter(r)}
+          >
             Rank {r}
           </Button>
         ))}
@@ -76,7 +97,10 @@ function MissionsPage() {
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {list.map((m) => (
-          <Card key={m.id} className="bg-scroll-paper shadow-card transition hover:border-primary/50">
+          <Card
+            key={m.id}
+            className="bg-scroll-paper shadow-card transition hover:border-primary/50"
+          >
             <CardContent className="space-y-3 p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -111,7 +135,12 @@ function MissionsPage() {
                 <Button size="sm" className="flex-1" onClick={() => start(m.id, m.title)}>
                   <Play className="size-3.5" /> Iniciar
                 </Button>
-                <Button size="sm" variant="outline" className="flex-1" onClick={() => complete(m.id)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => complete(m.id)}
+                >
                   <Check className="size-3.5" /> Concluir
                 </Button>
               </div>
